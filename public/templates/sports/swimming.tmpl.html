@@ -1,0 +1,34 @@
+<div ng-controller="swimmingCtrl">
+    <div class="right bottom swimmingclock scale-fade" ng-show="swimming.showclock">
+        <div class="row">
+            <div class="clock">
+                <div class="deciseconds">{{clockDec}}</div>
+                <div>{{clockMin}}:{{clockSec}}.</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="footer">{{swimming.distance}}</div>
+        </div>
+    </div>
+
+    <div class="left top slide-left swimmingsplits" ng-show="swimming.showsplits && swimming.laneOrder.length > 0">
+            <div class="row" ng-repeat="lane in swimming.laneOrder" ng-class="{ home: (lane.lane.team == swimming.homeTeam), away: (lane.lane.team == swimming.awayTeam) }"><span class="lane">{{lane.lane.id + 1}}</span>{{lane.lane.name}}<span class="splittime">{{lane.time}}</span></div>
+    </div>
+
+    <div class="middle center scale-fade swimminglist" ng-show="swimming.showlist">
+        <div ng-show="swimming.order.length > 0">
+            <div class="header">Results - {{swimming.distance}}</div>
+            <div class="row" ng-repeat="lane in swimming.laneOrder" ng-show="lane.lane.name">
+                <div class="lane">{{lane.lane.id + 1}}</div>
+                <div ng-class="{ home: (lane.lane.team == swimming.homeTeam), away: (lane.lane.team == swimming.awayTeam) }">
+                    <p>{{lane.lane.name}}</p>
+                </div>
+            </div>
+        </div>
+        <div ng-show="swimming.order.length == 0">
+            <div class="header">Start List - {{swimming.distance}}</div>
+            <div class="row" ng-repeat="lane in swimming.lanes" ng-class="{ home: (lane.team == swimming.homeTeam), away: (lane.team == swimming.awayTeam) }" ng-show="lane.name"><span class="lane">{{lane.id + 1}}</span>{{lane.name}}</div>
+        </div>
+    </div>
+</div>

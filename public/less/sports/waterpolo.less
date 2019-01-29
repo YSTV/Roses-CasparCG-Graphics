@@ -1,0 +1,69 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Waterpolo Score]                  */
+/**************************************************/
+
+.waterpolo {
+    width: 40%;
+    border-radius: 3px;
+    background-clip: padding-box;
+    font-size: 30px;
+    font-size: 1.8vw;
+}
+
+.waterpoloquarter {
+    display:inline;
+    white-space: nowrap;
+    clear:none;
+    background-color: @brand-background-colour-primary;
+    background-clip: padding-box;
+}
+
+.waterpoloquarter h1 {
+    color: @brand-text-colour-h1;
+    font-size: 30px;
+    font-size: 1.55vw;
+    line-height: 1.8vw;
+    font-weight: normal;
+    float: left;
+    padding: 3px 10px;
+    margin-right: 0px;
+    background-color: @brand-background-colour-primary;
+}
+
+.waterpoloquarter h1:empty {
+    display: none;
+}
+
+.waterpolo .clock, .waterpolo .score.home, .waterpolo .score.away {
+    padding: 3px;
+    float: left;
+}
+
+.waterpolo .clock {
+    background-color: @brand-background-colour-tertiary;
+    width: 18%;
+    text-align: center;
+}
+
+.waterpolo .score.home {
+    width: 32%;
+    text-align: right;
+    padding-right:20px;
+    color: @brand-text-colour-h1;
+    background-color: @team-1-colour;
+}
+
+.waterpolo .score.home p {
+    float: right;
+    text-align: center;
+}
+
+.waterpolo .score.away {
+    width: 32%;
+    text-align: left;
+    padding-left: 30px;
+    color: @brand-text-colour-h1-alt;
+    background-color: @team-2-colour;
+}

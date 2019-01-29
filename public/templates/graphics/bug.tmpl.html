@@ -1,0 +1,16 @@
+<div ng-controller="bugCtrl">
+    <div class="logo right top toggle" ng-show="bug.showLogo">
+        <img src="{{bug.logo}}" />
+    </div>
+    <div class="toggle" ng-show="bug.showGeneral"> 
+        <div class="bug top slide-left" ng-show="bug.showClock">
+            <h1 class="black">{{clock | date: "HH:mm"}}</h1>
+        </div>
+        <div class="bug top slide-left" ng-show="bug.showLive">
+            <h1 ng-show="bug.showLive">{{bug.livetext}}</h1>
+        </div>
+        <div class="bug top slide-left" ng-show="bug.showLocation">
+            <h1 class="white" ng-show="bug.showLocation">{{bug.locationtext}}</h1>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+<div ng-controller="rugbyCtrl" class="rugby left top scale-fade" ng-show="rugby.show">
+    <div class="row">
+        <div class="clock">{{clock}}</div>
+        <div class="score home">{{rugby.homeTeamShort}} </div>
+        <div ng-if="rugby.homeScore > -1 || rugby.awayScore > -1" class="score scoreNumber">{{rugby.homeScore}} - {{rugby.awayScore}}</div>
+        <div class="score away">{{rugby.awayTeamShort}}</div>
+    </div>
+    <div ng-show="rugby.showextratime" class="extratime scale-fade">ET</div>
+</div>

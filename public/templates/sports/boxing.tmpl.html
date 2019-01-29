@@ -1,0 +1,31 @@
+<div ng-controller="boxingCtrl">
+    <div ng-show="boxing.showScore" class="boxing right bottom scale-fade">
+
+        <div class="bar" ng-show="boxing.showTime">
+            <div class="gradient-overlay"><span class="timer">{{clock}}</span></div>
+            <div class="moving"></div>
+        </div>
+
+        <div class="score-inner">
+
+            <div class="float-left">
+                <h4>{{boxing.name1}}</h4>
+                <h1>{{boxing.homeScore}}</h1>
+                <h2>{{boxing.homeTeam}}</h2>
+            </div>
+
+            <div class="float-right">
+                <h4>{{boxing.name2}}</h4>
+                <h1>{{boxing.awayScore}}</h1>
+                <h2>{{boxing.awayTeam}}</h2>
+            </div>
+
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="bar">
+            <div class="gradient-overlay"><span>{{boxing.currRound}} Round</span></div>
+            <div class="red-moving"></div>
+        </div>
+    </div>
+</div>

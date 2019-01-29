@@ -1,0 +1,23 @@
+<div ng-controller="badmintonCtrl" class="right bottom badminton scale-fade" ng-show="badminton.show">
+    <div class="row header">
+        <div class="name">{{badminton.match}}&nbsp;</div>
+        <div class="game">GAME</div>
+        <div class="match">POINTS</div>
+    </div>
+
+    <div class="row">
+        <div class="name home">{{badminton.homeTeam}}</div>
+        <div class="games homeLight">{{badminton.game1}}</div>
+        <div class="matches homeLight">{{badminton.point1}}</div>
+    </div>
+
+    <div class="row">
+        <div class="name away">{{badminton.awayTeam}}</div>
+        <div class="games awayLight">{{badminton.game2}}</div>
+        <div class="matches awayLight">{{badminton.point2}}</div>
+    </div>
+
+    <div class="row">
+            <div class="footer">{{badminton.subtitle}}</div>
+    </div>
+</div>

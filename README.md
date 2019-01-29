@@ -22,3 +22,13 @@ node server.js
 For the [admin](http://127.0.0.1:3000/admin) page, navigate to http://127.0.0.1:3000/admin
 
 For the [graphics](http://127.0.0.1:3000) output, navigate to http://127.0.0.1:3000
+
+## Requirements
+* Node
+
+### Global Node Modules
+* gulp
+* less
+
+These can all be installed like so:
+`npm install -g gulp less`

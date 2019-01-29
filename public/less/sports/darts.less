@@ -1,0 +1,112 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Darts]                           */
+/**************************************************/
+
+.darts {
+    width: 35%;
+    background-color: @brand-background-colour-secondary;
+    text-align: center;
+    font-size: 20px;
+    border-radius: 5px;
+    background-clip: padding-box;
+}
+
+.darts .name {
+    text-align: left;
+    width: 57%;
+}
+
+
+.darts .name, .darts .legs, .darts .score, .darts .leg, .darts .footer, .darts .set, .darts .sets {
+    float: left;
+    line-height: 28px;
+
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.darts .name.home {
+    color: @brand-text-colour-h1;
+    background-color: @team-1-colour;
+}
+
+.darts .name.away {
+    color: @brand-text-colour-h1;
+    background-color: @team-2-colour;
+}
+
+.darts .homeLight {
+    background-color: lighten(@team-1-colour, 40%);
+}
+
+.darts .awayLight {
+    background-color: lighten(@team-2-colour, 40%);
+}
+
+.darts .legs {
+    width: 13%;
+    color: @brand-text-colour-h2-alt;
+}
+
+.darts .sets {
+    width: 13%;
+    color: @brand-text-colour-h2-alt;
+}
+
+.darts .score {
+    width: 17%;
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-secondary;
+}
+
+.darts .footer {
+    text-align: left;
+}
+
+.darts .header .name {
+    background-color: @brand-background-colour-secondary;
+    color: @brand-text-colour-h1;
+    width: 57%;
+    line-height: 30px;
+    line-height: 2.5vw;
+}
+
+.darts .header .name2 {
+    background-color: @brand-background-colour-secondary;
+    color: @brand-text-colour-h1;
+    width: 17%;
+    line-height: 30px;
+    line-height: 2.5vw;
+}
+
+.darts .header .leg {
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-secondary;
+    width: 13%;
+    font-size: 20px;
+    font-size: 1.3vw;
+    line-height: 30px;
+    line-height: 2.5vw;
+}
+.darts .header .set {
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-secondary;
+    width: 13%;
+    font-size: 20px;
+    font-size: 1.3vw;
+    line-height: 30px;
+    line-height: 2.5vw;
+}
+
+.darts .footer {
+    background-color: @brand-background-colour-secondary;
+    color: @brand-text-colour-h1;
+    text-transform: uppercase;
+    width: 100%;
+    font-size: 20px;
+    font-size: 1.3vw;
+    line-height: 30px;
+    line-height: 2.2vw;
+}

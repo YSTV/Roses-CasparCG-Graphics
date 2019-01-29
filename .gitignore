@@ -3,3 +3,5 @@
 .vagrant
 node_modules
 Node.js.lnk
+public/css/theme.css
+public/index.html

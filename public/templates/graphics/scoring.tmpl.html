@@ -1,0 +1,27 @@
+<div ng-controller="scoringCtrl">
+    <img ng-src="images/LancasterSport250.png" ng-show="roses.showScore" class="bottom leftLogo scale-fade"/>
+    <img ng-src="images/YorkSport250.png" ng-show="roses.showScore" class="bottom rightLogo scale-fade"/>
+    <div ng-show="roses.showScore" class="center bottom total-score scale-fade">
+        <h1>Roses 2018</h1>
+        <div class="float-left lanc">
+            <p>{{roses.lancScore}}</p>
+        </div>
+        <div class="float-right york">
+            <p>{{roses.yorkScore}}</p>
+        </div>
+    <div class="clearfix"></div>
+    </div>
+</div>
+
+<div ng-controller="scoringCtrl">
+    <div ng-show="roses.showProgress" class="bottom progress-bar slide-top" >
+        <p class="toWin">{{roses.pointsToWin}}</p>
+        <div class="york-progress" style="height:{{roses.yorkProgress}}%">
+            <p ng-if="roses.yorkScore > 0" class="scoreText">{{roses.yorkScore}}</p>
+        </div>
+        <div class="lanc-progress" style="height:{{roses.lancProgress}}%">
+            <p ng-if="roses.lancScore > 0" class="scoreText">{{roses.lancScore}}</p>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*                [Badminton]                     */
+/**************************************************/
+
+.badminton {
+    width: 35%;
+    background-color: @brand-background-colour-secondary;
+    text-align: center;
+    background-clip: padding-box;
+}
+
+.badminton .name {
+    text-align: left;
+}
+
+
+.badminton .name, .badminton .matches, .badminton .score, .badminton .match, .badminton .footer, .badminton .game, .badminton .games {
+    float: left;
+    font-size: 20px;
+    line-height: 28px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.badminton .name {
+    width: 57%;
+}
+
+.badminton .name.home {
+    color: @brand-text-colour-h1;
+    background-color: @team-1-colour;
+}
+
+.badminton .name.away {
+    color: @brand-text-colour-h1;
+    background-color: @team-2-colour;
+}
+
+.badminton .homeLight {
+    background-color: lighten(@team-1-colour, 40%);
+}
+
+.badminton .awayLight {
+    background-color: lighten(@team-2-colour, 40%);
+}
+
+.badminton .matches {
+    width: 21%;
+    color: @brand-text-colour-h2-alt;
+}
+
+.badminton .games {
+    width: 22%;
+    color: @brand-text-colour-h2-alt;
+}
+
+.badminton .header .name {
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-secondary;
+    width: 57%;
+}
+
+.badminton .header .match {
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-secondary;
+    width: 21%;
+}
+.badminton .header .game {
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-secondary;
+    width: 22%;
+}
+
+.badminton .footer {
+    background-color: @brand-background-colour-secondary;
+    color: @brand-text-colour-h1;
+    text-align: left;
+    text-transform: uppercase;
+    width: 100%;
+    font-size: 16px;
+    line-height: 30px;
+}

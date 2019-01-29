@@ -1,0 +1,61 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Boxing]                         */
+/**************************************************/
+.boxing {
+    background-color: @brand-background-colour-primary;
+    width: 15%;
+}
+
+.boxing .score-inner {
+    color: @brand-text-colour-h1;
+    text-align: center;
+    padding: 15px 30px 15px 30px;
+    background-color: @brand-background-colour-primary;
+}
+
+.boxing .boxing-score .score-inner .float-left {
+    padding-bottom: 12px;
+}
+
+.boxing .timer {
+    top: -2px;
+    font-size: 28px !important;
+}
+
+.boxing .score-inner h1 {
+    font-size: 35px;
+}
+
+.boxing .red-moving, .moving {
+    height: 40px;
+    width: 500%;
+}
+
+.boxing .bar {
+    overflow-x: hidden;
+    overflow-y:hidden;
+    width: 100%;
+    border-radius: 2px;
+}
+
+.boxing .bar .gradient-overlay {
+    position: absolute;
+    width: inherit;
+    height: 40px;
+    background-color: @brand-background-colour-secondary;
+}
+
+.boxing .gradient-overlay > span {
+    position:relative;
+    padding-top: 8px;
+    padding-left: 8px;
+    text-align: center;
+    text-transform:uppercase;
+    z-index:1;
+    display:block;
+    color:@brand-text-colour-h1;
+    font-size:22px;
+    text-shadow:1px -1px 0px @brand-text-colour-h1-alt;
+}

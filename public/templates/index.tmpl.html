@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html ng-app="cgApp">
+    <head>
+        <meta charset="UTF-8">
+        <title>CG</title>
+        <link rel="stylesheet" href="/css/reset.css" />
+        <link href="/css/fonts/montserrat.css" rel="stylesheet" type="text/css">
+        <link href="/css/theme.css" rel="stylesheet" type="text/css">
+        <link href="/css/animation.css" rel="stylesheet" type="text/css">
+    </head>
+
+    <body>
+        @@include('./graphics/bug.tmpl.html')
+        @@include('./graphics/grid.tmpl.html')
+        @@include('./graphics/lower-thirds.tmpl.html')
+        @@include('./graphics/scoring.tmpl.html')
+
+        @@include('./sports/archery.tmpl.html')
+        @@include('./sports/badminton.tmpl.html')
+        @@include('./sports/basketball.tmpl.html')
+        @@include('./sports/boxing.tmpl.html')
+        @@include('./sports/darts.tmpl.html')
+        @@include('./sports/football.tmpl.html')
+        @@include('./sports/netball.tmpl.html')
+        @@include('./sports/rugby.tmpl.html')
+        @@include('./sports/swimming.tmpl.html')
+        @@include('./sports/tennis.tmpl.html')
+        @@include('./sports/waterpolo.tmpl.html')
+
+        <script type="text/javascript" src="/js/socket.io.js"></script>
+        <script type="text/javascript" src="/js/libs/angular.min.js"></script>
+        <script type="text/javascript" src="/js/libs/angular-animate.min.js"></script>
+        <script type="text/javascript" src="/js/ng-socket-io.js"></script>
+        <script type="text/javascript" src="/js/cg.js"></script>
+
+    </body>
+</html>

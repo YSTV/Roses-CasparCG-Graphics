@@ -1,0 +1,119 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Grid]                            */
+/**************************************************/
+
+.grid {
+    margin-top: 40px;
+    position: absolute;
+    width: 650px;
+    text-align: center;
+    background-clip: padding-box;
+    overflow: hidden;
+}
+.grid h1 {
+    color:  @brand-text-colour-h1;
+    font-size: 22px;
+    font-weight: normal;
+    padding: 5px;
+    position: relative;
+    z-index: 1;
+    background-color: @brand-background-colour-primary;
+}
+
+.grid .gridleft, .grid .gridright {
+    float: left;
+    line-height: 24px;
+    background-color: @brand-background-colour-secondary;    
+    font-size: 18px;
+    color: @brand-text-colour-h1;
+}
+
+.grid .gridleft {
+    padding-left: 10px;
+    text-align: left;
+    float: left;
+    width: 50%;
+}
+    
+.grid .gridright {
+    border-left: 3px solid @brand-text-colour-h1;
+    float: right; 
+    width: 50%;
+}
+
+.sporttimesgridright {
+    width: 20% !important;
+    text-align: center;
+}
+
+.sporttimesgridleft {
+    width: 80% !important;
+}
+
+.halvesgridleft {
+    width: 50% !important;
+    text-align: left;
+    padding-left: 10px;
+}
+.halvesgridright {
+    width: 50% !important;
+    text-align: left;
+    padding-left: 10px;
+}
+
+.onebargridleft {
+    width: 100% !important;
+}
+
+.onebargridright {
+    display: none;
+}
+
+.grid .row {
+    display: flex;
+    color: @brand-text-colour-h1;
+    border-top: 3px solid @brand-background-colour-tertiary;
+    position: relative;
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.8s, opacity 0.8s;
+}
+
+.grid.ng-hide-remove .row {
+    transform: translateY(-5.5vw);
+    opacity: 0;
+    transition-duration: 0;
+}
+
+.grid .row:last-child {
+    margin-bottom: 5px;
+}
+.grid h1 {
+    color:  @brand-text-colour-h1;
+    font-size: 24px;
+    font-weight: normal;
+    padding: 5px;
+    background-color: @brand-text-colour-h2-alt;
+}
+
+.grid .gridleft {
+    padding-left: 10px;
+    text-align: left;
+    width: 80%;
+}
+
+.grid .gridright {
+    width: 20%;
+    border-left: 3px solid @brand-text-colour-h1;
+}
+
+.grid .row {
+    color: @brand-text-colour-h1;
+    border-top: 3px solid @brand-text-colour-h1;
+}
+
+.grid .row:last-child {
+    border-bottom: 3px solid @brand-background-colour-secondary;
+}

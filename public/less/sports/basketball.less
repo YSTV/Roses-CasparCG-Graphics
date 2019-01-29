@@ -1,0 +1,40 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Basketball Score]                  */
+/**************************************************/
+
+.basketball {
+    width: 25%;
+    background-clip: padding-box;
+    background-color: @brand-background-colour-tertiary;
+    font-size: 20px;
+    text-align: center;
+    line-height: 24px;
+}
+
+.basketball .clock, .basketball .score.home, .basketball .score.away {
+    padding: 3px;
+    float: left;
+}
+
+.basketball .clock {
+    background-color: @brand-background-colour-tertiary;
+    width: 24%;
+}
+
+.basketball .score.home {
+    width: 38%;
+    color: @brand-text-colour-h1;
+    background-color: @team-1-colour;
+}
+
+.basketball .score.home p {
+    float: right;
+}
+
+.basketball .score.away {
+    width: 38%;
+    color: @brand-text-colour-h1-alt;
+    background-color: @team-2-colour;
+}

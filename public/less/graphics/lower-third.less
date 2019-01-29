@@ -1,0 +1,41 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Lower Third]                     */
+/**************************************************/
+
+.lowerthird {
+    min-width: 17.5%;
+    background-clip: padding-box;
+}
+
+.lowerthird h1 {
+    color: @brand-text-colour-h1;
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 600;
+    padding: 5px 8px;
+    background-color: @brand-background-colour-primary;
+}
+
+.lowerthird h1:empty {
+    display: none;
+}
+
+.lowerthird h2 {
+    color: @brand-text-colour-h1;
+    font-size: 18px;
+    font-weight: normal;
+    padding: 5px 8px;
+    background-color: @brand-background-colour-secondary;
+    border-bottom: 3px solid @brand-background-colour-tertiary;
+}
+
+.lowerthird h2:empty {
+    display: none;
+}
+
+.lowerthird.bottom.fullwidth {
+    position: absolute;
+    left: 50px;
+}

@@ -1,0 +1,34 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Live Bug]                        */
+/**************************************************/
+.bug {
+    display:inline;
+    white-space: nowrap;
+    clear:none;
+    background-color: @brand-background-colour-secondary;
+}
+
+.bug h1 {
+    color: @brand-text-colour-h1;
+    font-size: 18px;
+    line-height: 20px;
+    float: left;
+    padding: 3px 10px;
+    margin-right: 0px;
+    background-color: @brand-background-colour-primary;
+}
+
+.bug h1:empty {
+    display: none;
+}
+
+.black {
+    background-color: @brand-background-colour-secondary !important;
+}
+
+.white {	
+    background-color: @brand-background-colour-tertiary !important;
+    color: @brand-text-colour-h2-alt !important;
+}

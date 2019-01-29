@@ -1,0 +1,156 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Swimming]                        */
+/**************************************************/
+
+.swimmingclock {
+    width: 20%;
+    background-color: @brand-background-colour-primary;
+    text-align: left;
+    border-radius: 5px;
+    background-clip: padding-box;
+}
+
+.swimmingclock .clock, .swimmingclock .footer {
+    float: left;
+    padding-right: 5px;
+    width: 100%;
+    text-align: right;
+}
+
+.swimmingclock .clock {
+    font-size: 25px;
+    font-size: 2.0vw;
+    line-height: 45px;
+    line-height: 3.3vw;
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-primary;
+}
+
+.swimmingclock .clock * {
+    float: right;
+}
+
+.swimmingclock .clock .deciseconds {
+    width: 8%;
+}
+
+.swimmingclock .footer {
+    background-color: @brand-background-colour-tertiary;
+    color: @brand-text-colour-h1-alt;
+    font-size: 20px;
+    font-size: 1.5vw;
+    line-height: 30px;
+    line-height: 2.5vw;
+    text-transform: uppercase;
+}
+
+.swimmingsplits {
+    background-color: @brand-background-colour-secondary;
+    color: @brand-text-colour-h1;
+    border-radius: 3px;
+    background-clip: padding-box;
+    width: 25%;
+}
+
+.swimmingsplits .row {
+    width: 100%;
+    font-size: 20px;
+    font-size: 1.3vw;
+    line-height: 30px;
+    line-height: 2.2vw;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.5)
+}
+
+.swimmingsplits .row .lane {
+    float: left;
+    margin-right: 5px;
+    width: 30px;
+    width: 2.2vw;
+    text-align: center;
+    border-right: 2px solid @brand-text-colour-h1;
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-primary;
+}
+
+.swimmingsplits .row .splittime {
+    float: right;
+    margin-left: 5px;
+    padding: 0px 10px;
+    color: @brand-text-colour-h1-alt;
+    background-color: @brand-background-colour-tertiary;
+    width: 20%;
+}
+
+.swimminglist {
+    top: 12%;
+    width: 60%;
+    border-radius: 5px;
+    background-clip: padding-box;
+}
+
+.swimminglist .header {
+    width: 100%;
+    font-size: 35px;
+    font-size: 2.7vw;
+    line-height: 55px;
+    line-height: 4vw;
+    overflow: hidden;
+    text-align: center;
+    text-transform: uppercase;
+    border-bottom: 3px solid @brand-background-colour-tertiary;
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-secondary;
+}
+
+.swimminglist .row {
+    width: 100%;
+    font-size: 30px;
+    font-size: 2.2vw;
+    line-height: 50px;
+    line-height: 3.8vw;
+    overflow: hidden;
+    border-bottom: 3px solid @brand-background-colour-tertiary;
+}
+
+.swimminglist .row .lane {
+    float: left;
+    border-right: 3px solid @brand-text-colour-h1;
+    width: 10%;
+    text-align: center;
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-primary;
+    padding: 10px;
+}
+
+.swimmingsplits .row.home {
+    color: @brand-text-colour-h1;
+    background-color: @team-1-colour;
+}
+
+.swimmingsplits .row.away {
+    color: @brand-text-colour-h1;
+    background-color: @team-2-colour;
+}
+
+.swimminglist .row .home {
+    color: @brand-text-colour-h1;
+    background-color: @team-1-colour;
+    padding: 10px;
+}
+
+.swimminglist .row .home p {
+    padding-left: 10%;
+}
+
+.swimminglist .row .away {
+    color: @brand-text-colour-h1;
+    background-color: @team-2-colour;
+    padding: 10px;
+}
+
+.swimminglist .row .away p {
+    padding-left: 10%;
+}

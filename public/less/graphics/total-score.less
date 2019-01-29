@@ -1,0 +1,103 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Total Score]                     */
+/**************************************************/
+
+.total-score, .football-score {
+    width: 35%;
+    text-align: center;
+    border-radius: 8px;
+    background-clip: padding-box;
+}
+
+.total-score h1 {
+    color: @brand-text-colour-h2-alt;
+    font-size: 20px;
+    padding: 6px;
+    text-transform: uppercase;
+    background-color: @brand-background-colour-tertiary !important;
+}
+
+.total-score .lanc {
+    display: block;
+    width: 50%;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 50px;
+    color: @brand-text-colour-h1;
+    padding: 6px;
+    background-color: @team-1-colour;
+}
+
+.total-score .york {
+    display: block;
+    width: 50%;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 50px;
+    color: @brand-text-colour-h1-alt;
+    padding: 6px;
+    background-color: @team-2-colour !important;
+}
+
+
+.leftLogo, .rightLogo {
+    height: 175px;
+    width: 175px;
+    z-index: 100;
+    bottom: 30px;
+}
+
+.leftLogo {
+    position: absolute;
+    left: 300px;
+}
+
+.rightLogo {
+    position: absolute;
+    right: 300px;
+
+}
+
+.progress-bar {
+    width: 60px;
+    height: 410px;
+    bottom: 50px;
+    position: absolute;
+    border-top: 3px black solid;
+    font-weight: bold;
+}
+
+.lanc-progress, .york-progress {
+    position: absolute;
+    bottom: 0px;
+    width: 29px;
+    text-align: center;
+    background-position: bottom;
+    background-repeat: repeat-y;
+}
+
+.lanc-progress {
+    left: 25px;
+    background-image: @team-1-logo;
+}
+
+.york-progress {
+    background-image: @team-2-logo;
+}
+
+.scoreText {
+    position: absolute;
+    top: -20px;
+    z-index: 3;
+    text-align: center;
+    font-size: 	12px;
+}
+
+.toWin {
+    position: absolute;
+    top: -12px;
+    left: 65px;
+    font-size: 18px;
+}

@@ -1,0 +1,82 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Rugby Score]                     */
+/**************************************************/
+
+.rugby {
+    width: 25%;
+    background-clip: padding-box;
+    font-size: 20px;
+    text-align: center;
+    line-height: 24px;
+}
+
+.rugby-score h1 {
+    padding: 6px;
+    padding-left: 58px !important;
+    padding-right: 44px !important;
+    text-transform: uppercase;
+}
+
+.rugbytop h1 {
+    color: @brand-text-colour-h1-alt;
+    background-color: @brand-background-colour-tertiary !important;
+    line-height: 24px;
+}
+
+.rugbytop h1:empty {
+    display: none;
+}
+
+.rugbybottom h1 {
+    color: @brand-text-colour-h1;
+    background-color: @brand-text-colour-h2-alt !important;
+    line-height: 24px;
+}
+
+.rugbybottom h1:empty {
+    display: none;
+}
+
+
+.rugby .clock, .rugby .score.home, .rugby .score.away, .rugby .scoreNumber {
+    padding: 3px;
+    float: left;
+}
+
+.rugby .scoreNumber {
+    color: @brand-text-colour-h1;
+    background-color: @brand-background-colour-secondary;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.rugby .clock {
+    background-color: @brand-background-colour-tertiary;
+    width: 24%;
+}
+
+.rugby .extratime {
+    background-color: @brand-background-colour-primary;
+    color: @brand-text-colour-h1;;
+    width: 12%;
+    padding: 3px;
+    margin-left: 23px;
+}
+
+.rugby .score.home {
+    width: 22%;
+    color: @brand-text-colour-h1;
+    background-color: @team-1-colour;
+}
+
+.rugby .score.home p {
+    float: right;
+}
+
+.rugby .score.away {
+    width: 22%;
+    color: @brand-text-colour-h2-alt;
+    background-color: @team-2-colour;
+}

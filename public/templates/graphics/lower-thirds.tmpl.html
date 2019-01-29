@@ -1,0 +1,16 @@
+<div ng-controller="lowerThirdsCtrl">
+    <div class="lowerthird bottom fullwidth scale-fade" ng-show="lowerThirds.full.show">
+        <h1>{{lowerThirds.full.heading}}</h1>
+        <h2 ng-show="lowerThirds.full.subHeading">{{lowerThirds.full.subHeading}}</h2>
+    </div>
+
+    <div class="lowerthird left bottom slide-left" ng-show="lowerThirds.left.show">
+        <h1>{{lowerThirds.left.heading}}</h1>
+        <h2 ng-show="lowerThirds.left.subHeading">{{lowerThirds.left.subHeading}}</h2>
+    </div>
+
+    <div class="lowerthird right bottom slide-right" ng-show="lowerThirds.right.show">
+        <h1>{{lowerThirds.right.heading}}</h1>
+        <h2 ng-show="lowerThirds.right.subHeading">{{lowerThirds.right.subHeading}}</h2>
+    </div>
+</div>

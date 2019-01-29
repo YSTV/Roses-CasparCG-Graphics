@@ -1,0 +1,29 @@
+<div ng-controller="archeryCtrl" class="left bottom archery scale-fade" ng-show="archery.show">
+    <div class="row header">
+        <div class="name">Archery</div>
+        <div class="leg hits">HITS</div>
+        <div class="leg total">TOTAL</div>
+    </div>
+
+    <div class="row">
+        <div class="name home">{{archery.team1}}</div>
+        <div class="score">
+            <div ng-repeat="letter in archery.shots1.split('')  track by $index" class="repeated">
+            <div ng-if="letter == 'H'" class="archery-hit"></div>
+            <div ng-if="letter == 'M'" class="archery-miss"></div>
+            </div>
+        </div>
+        <div class="totalScore">{{archery.score1}}</div>
+    </div>
+
+    <div class="row">
+        <div class="name away">{{archery.team2}}</div>
+        <div class="score">
+            <div ng-repeat="letter in archery.shots2.split('')  track by $index" class="repeated">
+            <div ng-if="letter == 'H'" class="archery-hit"></div>
+            <div ng-if="letter == 'M'" class="archery-miss"></div>
+            </div>
+        </div>
+        <div class="totalScore">{{archery.score2}}</div>
+    </div>
+</div>

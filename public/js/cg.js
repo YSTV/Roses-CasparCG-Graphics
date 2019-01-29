@@ -1,50 +1,18 @@
 var app = angular.module('cgApp', ['ngAnimate', 'socket-io']);
+var data_timeout = 100;
 
-app.controller('lowerThirdsCtrl', ['$scope', 'socket',
-    function($scope, socket){
-        $scope.showLeft = false;
+app.controller('lowerThirdsCtrl', ['$scope', 'socket', '$http',
+    function($scope, socket, $http){
+        function getLowerThirds() {
+            $http.get('http://127.0.0.1:3000/lower-third')
+            .then(function(response){
+                if (response.status == 200 && response.data) {
+                    $scope.lowerThirds = response.data;
+                }
+            })
+        }
 
-        socket.on("lowerthird:hideall", function (msg) {
-            $scope.showLeft = false;
-            $scope.showRight = false;
-            $scope.showFull = false;
-        });
-
-        socket.on("lowerthird:hidefull", function (msg) {
-            $scope.showFull = false;
-        });
-
-        socket.on("lowerthird:hideleft", function (msg) {
-            $scope.showLeft = false;
-        });
-
-        socket.on("lowerthird:hideright", function (msg) {
-            $scope.showRight = false;
-        });
-
-        socket.on("lowerthird:left", function (msg) {
-            if($scope.showLeft) {
-                $scope.showLeft = false;
-            }
-            $scope.left = msg;
-            $scope.showLeft = true;
-        });
-
-        socket.on("lowerthird:right", function (msg) {
-            if($scope.showRight) {
-                $scope.showRight = false;
-            }
-            $scope.right = msg;
-            $scope.showRight = true;
-        });
-
-        socket.on("lowerthird:full", function (msg) {
-            if($scope.showFull) {
-                $scope.showFull = false;
-            }
-            $scope.full = msg;
-            $scope.showFull = true;
-        });
+        setInterval(getLowerThirds, data_timeout);
     }
 ]);
 
@@ -80,99 +48,65 @@ app.controller('boxingCtrl', ['$scope', 'socket',
     }
 ]);
 
-app.controller('bugCtrl', ['$scope', '$timeout', 'socket',
-    function($scope, $timeout, socket){
+/**
+ * Bug controller.
+ */
+app.controller('bugCtrl', ['$scope', '$timeout', '$http', 
+    function($scope, $timeout, $http){
         $scope.tickInterval = 1000; //ms
-
-        socket.on("bug", function (state) {
-            $scope.state = state;
-        });
-
-        $scope.$watch('bug', function() {
-            if (!$scope.bug) {
-                getBugData();
-            }
-        }, true);
-
-		socket.on("bug", function (msg) {
-            $scope.bug = msg;
-        });
-
+        
+        /**
+         * Gets the state of the bug from the API.
+         */
         function getBugData() {
-            socket.emit("bug:get");
+            $http.get("http://127.0.0.1:3000/bug")
+            .then(function(response){
+                if (response.status == 200) {
+                    // Only update if the new data is different.
+                    if ($scope.bug != response.data) {
+                        $scope.bug = response.data
+                    }
+                }
+            })
         };
-
+        
+        /**
+         * Updates the clock.
+         */
         var tick = function () {
-            $scope.clock = Date.now(); // get the current time
-            $timeout(tick, $scope.tickInterval); // reset the timer
+            $scope.clock = Date.now(); // Get the current time.
+            $timeout(tick, $scope.tickInterval); // Reset the timer.
         };
 
-        // Start the timer
+        // Start the timer.
         $timeout(tick, $scope.tickInterval);
+
+        // Get bug data once every timeout period.
+        setInterval(getBugData, data_timeout);
     }
 ]);
 
-app.controller('scoringCtrl', ['$scope', '$interval', '$http', 'socket',
-    function($scope, $interval, $http, socket){
-        $scope.tickInterval = 5000;
-        $scope.yorkScore = "";
-        $scope.lancScore = "";
+/**
+ * Roses score.
+ */
+app.controller('scoringCtrl', ['$scope', '$http', 'socket',
+    function($scope, $http, socket){
+        $scope.roses = {}
 
-        var fetchScore = function () {
-          var config = {headers:  {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            }
-          };
-
-          $http.get('https://roseslive.co.uk/score.json', config)
-            .success(function(data) {
-              if(isNaN(data.york) || isNaN(data.lancs)){
-                console.log("Roses live is giving us nonsense");
-                return;
-              };
-              if(!$scope.manualScore){
-                $scope.yorkScore = data.york;
-                $scope.lancScore = data.lancs;
-              };
-                socket.emit('lancScore', data.lancs);
-                socket.emit('yorkScore', data.york);
-            }
-          );
-        };
-
-        socket.on("score", function (state) {
-            $scope.showScore = state.showScore;
-            $scope.manualScore = state.manualScore;
-            $scope.showProgress = state.showProgress;
-            if(state.manualScore){
-              $scope.yorkScore = state.yorkScore;
-              $scope.lancScore = state.lancScore;
-            };
-			if(state.totalPoints){
-                $scope.pointsToWin = ((state.totalPoints / 2 ) + 0.5)
-            } else {
-                $scope.pointsToWin = 177.5;
-            }
-			$scope.yorkProgress = (($scope.yorkScore / $scope.pointsToWin)*100).toFixed(2);
-			$scope.lancProgress = (($scope.lancScore / $scope.pointsToWin)*100).toFixed(2);
-            $scope.pointsToWin = $scope.pointsToWin.toFixed(1);
-        });
-
-        $scope.$watch('score', function() {
-            if (!$scope.score) {
-                getScoreData();
-            }
-        }, true);
-
-        function getScoreData() {
-            socket.emit("score:get");
+        /**
+         * Gets the score from API.
+         */
+        function getRoses() {
+            $http.get('http://127.0.0.1:3000/roses')
+            .then(function(response) {
+                if (response.status == 200 && response.data) {
+                    $scope.roses = response.data;
+                }
+            })
         }
 
-        //Intial fetch
-        fetchScore();
-        // Start the timer
-        $interval(fetchScore, $scope.tickInterval);
+        // Get Roses data once every timeout period.
+        setInterval(getRoses, data_timeout);
     }
 ]);
 
@@ -226,32 +160,112 @@ app.controller('rugbyCtrl', ['$scope', 'socket',
 
 app.controller('dartsCtrl', ['$scope', 'socket',
     function($scope, socket){
-        socket.on("dart", function (msg) {
+        socket.on("darts", function (msg) {
             $scope.darts = msg;
         });
 
-        $scope.$watch('dart', function() {
-            if (!$scope.dart) {
+        $scope.$watch('darts', function() {
+            if (!$scope.darts) {
                 getDartData();
             }
         }, true);
 
         function getDartData() {
-            socket.emit("dart:get");
+            socket.emit("darts:get");
         }
     }
 ]);
 
-app.controller('gridCtrl', ['$scope', 'socket',
-    function($scope, socket){
-        socket.on("grid", function (payload) {
-            if (payload === "hide") {
-                $scope.show = false;
-            } else {
-                $scope.show = true;
-                $scope.grid = payload;
+/**
+ * Grid
+ */
+app.controller('gridCtrl', ['$scope', 'socket', '$http', 
+    function($scope, socket, $http){
+        $scope.grid = {}
+
+        // Lock changes to the scope so that the grid is not update multiple times, causing ng-repeat issues.
+        $scope.lock = false;
+
+        /**
+         * Gets the state of the grid.
+         */
+        function getGrid() {
+            if (!$scope.lock) {
+                // Lock changes.
+                $scope.lock = true;
+
+                $http.get('http://127.0.0.1:3000/grid')
+                .then(function(response) {
+                    // Check for a valid response.
+                    if (response.status == 200 && response.data) {
+
+                        // Set 'easy' properties.
+                        $scope.grid.headingcolor = response.data.headingcolor;
+                        $scope.grid.leftcolor = response.data.leftcolor;
+                        $scope.grid.rightcolor = response.data.rightcolor;
+                        $scope.grid.header = response.data.header;
+                        $scope.grid.position = response.data.position;
+                        $scope.grid.split = response.data.split;
+                        $scope.grid.show = response.data.show;
+                        
+                        // If the rows have not changed, no changes are needed.
+                        if (!rowsEquivalent(response.data.rows)) {
+                            // If the grid is currently shown, we need to hide it to update it.
+                            if ($scope.grid.show === true) {
+                                $scope.grid.show = false;
+                                $scope.grid.rows = [];
+                                
+                                // Wait until the grid is hidden. ng-repeat causes issues if we update while the grid is shown.
+                                setTimeout(function() {
+                                    $scope.grid.rows = response.data.rows;
+                                    $scope.grid.show = true;
+
+                                    $scope.lock = false;
+                                }, 2000)
+                            } else {
+                                // If the grid is currently hidden, we can just update it.
+                                $scope.grid.rows = response.data.rows;
+
+                                $scope.lock = false;
+                            }
+                        } else {
+                            $scope.lock = false;
+                        }
+                    } else {
+                        $scope.lock = false;
+                    }
+                })
             }
-        });
+        }
+
+        /**
+         * Returns true if the rows are equivalent to the currently displayed rows.
+         * @param {} rows 
+         */
+        function rowsEquivalent(rows) {
+            if (!$scope.grid.rows) {
+                return false
+            }
+
+            if (rows.length != $scope.grid.rows.length) {
+                return false
+            }
+
+            for (var i = 0; i < $scope.grid.rows.length; i++) {
+                if (rows[i].right != $scope.grid.rows[i].right) {
+                    return false;
+                }
+
+                if (rows[i].left != $scope.grid.rows[i].left) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Call getGrid once every data timeout period.
+        setInterval(getGrid, data_timeout);
     }
 ]);
 
@@ -360,21 +374,21 @@ app.controller('netballCtrl', ['$scope', 'socket',
         socket.on("netball", function (msg) {
             $scope.netball = msg;
 
-            if ($scope.netball.firstpasslanc == true) {
-            	$scope.netball.lancoffset = 1;
+            if ($scope.netball.firstpasshome == true) {
+            	$scope.netball.homeoffset = 1;
             }
 
-            if ($scope.netball.firstpasslanc == true & $scope.netball.firstpassyork == true) {
-            	$scope.netball.lancoffset = 0;
+            if ($scope.netball.firstpasshome == true & $scope.netball.firstpassaway == true) {
+            	$scope.netball.homeoffset = 0;
             }
 
-            $scope.TotalScore = $scope.netball.yorkScore + $scope.netball.lancScore + $scope.netball.lancoffset;
+            $scope.TotalScore = $scope.netball.awayScore + $scope.netball.homeScore + $scope.netball.homeoffset;
 			if (($scope.TotalScore % 2) == 1) {
-						$scope.showcurrentlancs = true;
-						$scope.showcurrentyork = false;
+						$scope.showcurrenthome = true;
+						$scope.showcurrentaway = false;
 				} else {
-						$scope.showcurrentlancs = false;
-						$scope.showcurrentyork = true;
+						$scope.showcurrenthome = false;
+						$scope.showcurrentaway = true;
 					}
 			});
 

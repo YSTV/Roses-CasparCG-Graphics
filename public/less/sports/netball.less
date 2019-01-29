@@ -1,0 +1,66 @@
+@import (once) "../current-theme.less";
+
+/**************************************************/
+/*              [Netball Score]                  */
+/**************************************************/
+
+.netball {
+    width: 35%;
+    border-radius: 3px;
+    background-clip: padding-box;
+    font-size: 20px;
+}
+
+.netballquarter {
+    display:inline;
+    white-space: nowrap;
+    clear:none;
+    background-color: @brand-background-colour-primary;
+    background-clip: padding-box;
+}
+
+.netballquarter h1 {
+    color: @brand-text-colour-h1;
+    font-size: 20px;
+    font-weight: normal;
+    float: left;
+    padding: 3px 10px;
+    margin-right: 0px;
+    background-color: @brand-background-colour-primary; // quad
+}
+
+.netballquarter h1:empty {
+    display: none;
+}
+
+.netball .clock, .netball .score.home, .netball .score.away {
+    padding: 3px;
+    float: left;
+}
+
+.netball .clock {
+    background-color: @brand-background-colour-tertiary;
+    width: 18%;
+    text-align: center;
+}
+
+.netball .score.home {
+    width: 32%;
+    text-align: right;
+    padding-right:20px;
+    color: @brand-text-colour-h1;
+    background-color: @team-1-colour;
+}
+
+.netball .score.home p {
+    float: right;
+    text-align: center;
+}
+
+.netball .score.away {
+    width: 32%;
+    text-align: left;
+    padding-left: 30px;
+    color: @brand-text-colour-h1-alt;
+    background-color: @team-2-colour;
+}

@@ -1,0 +1,117 @@
+@import (once) "current-theme.less";
+
+* {
+    -webkit-box-sizing: border-box;
+    box-sizing:border-box;                              /* This sets all elements to be the actual set dimensions, disregarding padding and borders */
+    webkit-backface-visibility: hidden;                 /* Hide the backface of elements - usuefull for 3d effects */
+    -webkit-transition: translate3d(0,0,0);             /* Turns on hardware acceleration - not known to be of benefit in CCG, but won't hurt */
+}
+
+body {
+    padding: 50px; /* Safe area */
+    font-family: 'Montserrat', sans-serif;
+    background:transparent;                             /* The HTML consumer actually makes your background transparent by default, unless a color or image is specified - but this might be usefull when debugging in browsers */
+    overflow:hidden;                                    /* Hide any overflowing elements - to disable scollbars */
+    -webkit-font-smoothing:antialiased !important;
+}
+
+
+@-webkit-keyframes moving-gradient {
+    0% { background-position: left bottom; }
+    100% { background-position: right bottom; }
+}
+
+h1, h2, h3, h4 {
+    margin:0;
+    padding:0;
+}
+
+.large {
+    top: -13px;
+    font-size: 40px !important;
+}
+
+/**************************************************/
+/*              [Layout]                          */
+/**************************************************/
+.left{
+    position: absolute;
+    left: 50px;
+}
+
+.right {
+    position: absolute;
+    right: 50px;
+    text-align: right;
+}
+
+.bottom {
+    bottom: 50px;
+}
+
+.fullwidth {
+    width: 1180px;
+}
+
+.top {
+    top: 50px;
+}
+
+.center {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+}
+
+.float-left {
+    float: left;
+}
+.float-right {
+    float: right;
+}
+
+.wrapper {
+    overflow: hidden;
+}
+
+.clearfix:after {
+    content: " "; /* Older browser do not support empty content */
+    visibility: hidden;
+    display: block;
+    height: 0;
+    clear: both;
+}
+
+.row:after {
+    display: table;
+    content: " ";
+}
+
+.row:after {
+    clear: both;
+}
+
+/**************************************************/
+/*              [Sports]                          */
+/**************************************************/
+@import (once) "sports/archery.less";
+@import (once) "sports/badminton.less";
+@import (once) "sports/basketball.less";
+@import (once) "sports/boxing.less";
+@import (once) "sports/darts.less";
+@import (once) "sports/football.less";
+@import (once) "sports/netball.less";
+@import (once) "sports/rugby.less";
+@import (once) "sports/swimming.less";
+@import (once) "sports/tennis.less";
+@import (once) "sports/waterpolo.less";
+
+/**************************************************/
+/*              [Other Graphics]                  */
+/**************************************************/
+@import (once) "graphics/grid.less";
+@import (once) "graphics/live-bug.less";
+@import (once) "graphics/logo.less";
+@import (once) "graphics/lower-third.less";
+@import (once) "graphics/total-score.less";

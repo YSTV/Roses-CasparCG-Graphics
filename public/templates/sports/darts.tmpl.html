@@ -1,0 +1,25 @@
+<div ng-controller="dartsCtrl" class="right bottom darts scale-fade" ng-show="darts.show">
+    <div class="row header">
+        <div class="name">{{darts.match}}&nbsp;</div>
+        <div class="set">SETS</div>
+        <div class="leg">LEGS</div>
+    </div>
+
+    <div class="row">
+        <div class="name home">{{darts.player1}}</div>
+        <div class="sets homeLight">{{darts.set1}}</div>
+        <div class="legs homeLight">{{darts.leg1}}</div>
+        <div class="score">{{darts.score1}}</div>
+    </div>
+
+    <div class="row">
+        <div class="name away">{{darts.player2}}</div>
+        <div class="sets awayLight">{{darts.set2}}</div>
+        <div class="legs awayLight">{{darts.leg2}}</div>
+        <div class="score">{{darts.score2}}</div>
+    </div>
+
+    <div class="row">
+            <div class="footer">best of 3 legs wins set</div>
+    </div>
+</div>
