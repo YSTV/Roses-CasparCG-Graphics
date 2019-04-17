@@ -10,27 +10,40 @@
 	</div>
 
 	<div class="inline field">
-		<checkbox size="large" ng-model="roses.showScore" type="toggle">Show Overall Score</checkbox>
-	
-		<checkbox size="large" ng-model="roses.showProgress" type="toggle">Show Winning Progress</checkbox>
-		
-		<input id="totalPoints" type="number" ng-model="roses.totalPoints"/>&nbsp Available Points
+		<div class="ui toggle checkbox">
+				<input type="checkbox" ng-model="roses.showScore" >
+				<label>Show Score</label>
+		</div>
+		<div class="ui toggle checkbox">
+				<input type="checkbox" ng-model="roses.showProgress" >
+				<label>Show Winning Progress</label>
+		</div>
+
+
 	</div>
 	<div class="ui divider"></div>
 	<div class="inline field">
-		<checkbox size="large" ng-model="roses.manualScore" type="toggle">Manual Score</checkbox>
+		<div class="ui toggle checkbox">
+				<input type="checkbox" ng-model="roses.manualScore" >
+				<label>Manual Score</label>
+		</div>
 	</div>
 	<br />
-	<div class="two fields">
+	<div class="three fields">
 		<div class="field">
 			<label for="York">York</label>
 			<input id="York" placeholder="York" type="text" ng-disabled="!roses.manualScore" ng-trim="true" ng-model="roses.yorkScore"/>
 		</div>
 
 		<div class="field">
-		<label for="Lancs">Lancaster</label>
-		<input id="Lancs" placeholder="Lancaster" type="text" ng-trim="true" ng-disabled="!roses.manualScore" ng-model="roses.lancScore">
+			<label for="Lancs">Lancaster</label>
+			<input id="Lancs" placeholder="Lancaster" type="text" ng-trim="true" ng-disabled="!roses.manualScore" ng-model="roses.lancScore">
+		</div>
+		<div class="field">
+			<label for="totlePoints">Available Points</label>
+			<input id="totalPoints" type="number" ng-trim="true" ng-disabled="!roses.manualScore" ng-model="roses.totalPoints" />
 		</div>
 	</div>
+
 
 </div>

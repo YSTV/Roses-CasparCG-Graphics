@@ -2,7 +2,7 @@
     <div ng-show="boxing.showScore" class="boxing right bottom scale-fade">
 
         <div class="bar" ng-show="boxing.showTime">
-            <div class="gradient-overlay"><span class="timer">{{clock}}</span></div>
+            <div class="gradient-overlay" ng-controller="clockCtrl"><span class="timer">{{stopwatch.time}}</span></div>
             <div class="moving"></div>
         </div>
 

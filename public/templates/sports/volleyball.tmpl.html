@@ -1,0 +1,7 @@
+<div ng-controller="volleyballCtrl" class="volleyball left top scale-fade" ng-show="volleyball.showScore">
+    <div class="row">
+        <div class="score home">{{volleyball.homeTeam}} {{volleyball.homeScore}}</div>
+        <div class="score away">{{volleyball.awayScore}} {{volleyball.awayTeam}}</div>
+        <div class="clock" ng-show="volleyball.showClock" ng-controller="clockCtrl">{{stopwatch.short}}</div>
+    </div>
+</div>

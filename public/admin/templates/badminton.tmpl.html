@@ -3,7 +3,12 @@
 
     <div class="ui grid center aligned">
         <div class="4 wide column">
-            <div class="field"><checkbox ng-model="badminton.show" size="large" type="toggle">Show Badminton Score</checkbox></div>
+            <div class="field">
+              <div class="ui toggle checkbox">
+                <input type="checkbox" ng-model="badminton.show">
+                <label>Show Score</label>
+              </div>
+            </div>
         </div>
     </div>
 

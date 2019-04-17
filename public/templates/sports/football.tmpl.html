@@ -1,6 +1,6 @@
 <div ng-controller="footballCtrl" class="football left top scale-fade" ng-show="football.show">
     <div class="row">
-        <div class="clock">{{clock}}</div>
+        <div class="clock" ng-controller="clockCtrl">{{stopwatch.short}}</div>
         <div class="score home">{{football.homeTeamShort}}</div>
         <div class="score scoreNumber">{{football.homeScore}} - {{football.awayScore}}</div>
         <div class="score away">{{football.awayTeamShort}}</div>

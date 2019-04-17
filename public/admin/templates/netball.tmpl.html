@@ -2,11 +2,20 @@
     <h2>Netball</h2>
 
     <div class="ui grid center aligned">
-        <div class="ten wide column">
+        <div class="sixteen wide column">
             <div class="inline field">
-                <checkbox ng-model="netball.show" size="large" type="toggle">Show Score Bar</checkbox>   
-           		<checkbox ng-model="netball.showcurrent" size="large" type="toggle">Show Center Pass</checkbox>
-           		<checkbox ng-model="netball.showquarter" size="large" type="toggle">Show Quarter</checkbox>
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" ng-model="netball.show">
+                    <label>Show Score Bar</label>
+                </div>
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" ng-model="netball.showcurrent">
+                    <label>Show Center Pass</label>
+                </div>
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" ng-model="netball.showquarter">
+                    <label>Show Quarter</label>
+                </div>
             </div>
         </div>
     </div>
@@ -15,19 +24,19 @@
 
     <div class="ui grid">
         <div class="five wide column center aligned">
-            <h2 class="ui header">{{clock}}</h2>
-            <dropdown title="Current Quarter" ng-model="netball.currQuarter" on-change="quarterChanged()">
-                <dropdown-group>1st</dropdown-group>
-                <dropdown-group>2nd</dropdown-group>
-                <dropdown-group>3rd</dropdown-group>
-                <dropdown-group>4th</dropdown-group>
-                <dropdown-group>ET</dropdown-group>
-            </dropdown>
+            <h2 class="ui header">{{clock.time}}</h2>
+            <select title="Current Quarter" ng-model="netball.currQuarter" class="ui fluid dropdown">
+                <option value="1st">1st</option>
+                <option value="2nd">2nd</option>
+                <option value="3rd">3rd</option>
+                <option value="4th">4th</option>
+                <option value="ET">ET</option>
+            </select>
         </div>
 
         <div class="five wide column">
-            <div class="ui action input">
-                <input type="text" placeholder="mm:ss" ng-model="time" size="10">
+            <div class="ui action input fluid">
+                <input type="text" placeholder="mm:ss" ng-model="time">
                 <div class="ui button" ng-click="setClock(time)">Set</div>
             </div>
         </div>
@@ -81,14 +90,20 @@
         </div>
     </div>
 
-	  <div class="ui grid center aligned">
+    <div class="ui grid center aligned">
         <div class="eight wide column">
-        	<checkbox ng-model="netball.firstpasshome" size="large" type="toggle">Even Passes (First Center)</checkbox>
+            <div class="ui toggle checkbox">
+                <input type="checkbox" ng-model="netball.firstpasshome">
+                <label>Even Passes (First Center)</label>
+            </div>
         </div>
-         <div class="eight wide column">
-            <checkbox ng-model="netball.firstpassaway" size="large" type="toggle">Even Passes (First Center)</checkbox>
+        <div class="eight wide column">
+            <div class="ui toggle checkbox">
+                <input type="checkbox" ng-model="netball.firstpassaway">
+                <label>Even Passes (First Center)</label>
+            </div>
         </div>
-      </div>  
+    </div>
 
     <div class="ui divider"></div>
 
