@@ -4,7 +4,10 @@
     <div class="ui grid center aligned">
         <div class="eight wide column">
             <div class="field">
-                <checkbox ng-model="basketball.show" size="large" type="toggle">Show Score Bar</checkbox>
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" ng-model="basketball.show">
+                    <label>Show Score Bar</label>
+                </div>
             </div>
         </div>
     </div>
@@ -13,12 +16,12 @@
 
     <div class="ui grid">
         <div class="three wide column center aligned">
-            <h2 class="ui header">{{clock}}</h2>
+            <h2 class="ui header">{{clock.time}}</h2>
         </div>
 
         <div class="five wide column">
-            <div class="ui action input">
-                <input type="text" placeholder="mm:ss" ng-model="time" size="10">
+            <div class="ui action input fluid">
+                <input type="text" placeholder="mm:ss" ng-model="time">
                 <div class="ui button" ng-click="setClock(time)">Set</div>
             </div>
         </div>

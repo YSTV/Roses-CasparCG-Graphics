@@ -2,7 +2,7 @@
     <div class="row">
         <div class="score home"><span ng-show="waterpolo.showcurrent"><span ng-show="showcurrenthome">&diams;</span></span>{{waterpolo.homeTeam}} {{waterpolo.homeScore}}</div>
         <div class="score away">{{waterpolo.awayScore}} {{waterpolo.awayTeam}}<span ng-show="waterpolo.showcurrent"><span ng-show="showcurrenthome">&diams;</span></span></div>
-        <div class="clock">{{clock}}</div>
+        <div class="clock" ng-controller="clockCtrl">{{stopwatch.short}}</div>
         <div class="waterpoloquarter fade" ng-show="waterpolo.showquarter"><h1>{{waterpolo.currentQuarter}}</h1></div>
     </div>
 </div>

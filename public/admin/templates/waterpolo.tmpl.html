@@ -4,8 +4,14 @@
     <div class="ui grid center aligned">
         <div class="ten wide column">
             <div class="inline field">
-                <checkbox ng-model="waterpolo.show" size="large" type="toggle">Show Score Bar</checkbox>
-           		<checkbox ng-model="waterpolo.showquarter" size="large" type="toggle">Show Quarter</checkbox>
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" ng-model="waterpolo.show">
+                    <label>Show Score Bar</label>
+                </div>
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" ng-model="waterpolo.showquarter">
+                    <label>Show Quarter</label>
+                </div>
             </div>
         </div>
     </div>
@@ -14,18 +20,18 @@
 
     <div class="ui grid">
         <div class="five wide column center aligned">
-          <h2 class="ui header">{{clock}}</h2>
-          <dropdown title="Current Quarter" ng-model="waterpolo.currentQuarter" on-change="quarterChanged()">
-            <dropdown-group>1st</dropdown-group>
-            <dropdown-group>2nd</dropdown-group>
-            <dropdown-group>3rd</dropdown-group>
-            <dropdown-group>4th</dropdown-group>
-          </dropdown>
+            <h2 class="ui header">{{clock.time}}</h2>
+            <select title="Current Quarter" ng-model="waterpolo.currentQuarter" class="ui fluid dropdown">
+                <option value="1st">1st</option>
+                <option value="2nd">2nd</option>
+                <option value="3rd">3rd</option>
+                <option value="4th">4th</option>
+            </select>
         </div>
 
         <div class="five wide column">
-            <div class="ui action input">
-                <input type="text" placeholder="mm:ss" ng-model="time" size="10">
+            <div class="ui action input fluid">
+                <input type="text" placeholder="mm:ss" ng-model="time">
                 <div class="ui button" ng-click="setClock(time)">Set</div>
             </div>
         </div>
@@ -43,7 +49,7 @@
             <div class="ui icon green button" ng-click="downClock()">
                 <i class="down arrow icon"></i>
             </div>
-            
+
             <div class="ui button" ng-click="resetClock()">Reset</div>
           </div>
         </div>

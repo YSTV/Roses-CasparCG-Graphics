@@ -1,9 +1,11 @@
-var app = angular.module('StarterApp', ['ngRoute', 'LocalStorageModule', 'angularify.semantic', 'socket-io']);
+var app = angular.module('StarterApp', ['ngRoute', 'LocalStorageModule', 'semantic-ui']);
 
 var data_timeout = 1000;
 
-app.controller('AppCtrl', ['$scope', '$location', 'socket', '$http',
-    function($scope, $location, socket, $http){
+var api_root = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
+
+app.controller('AppCtrl', ['$scope', '$location', '$http',
+    function($scope, $location, $http){
 
         $scope.menu = [];
 
@@ -131,16 +133,63 @@ app.controller('AppCtrl', ['$scope', '$location', 'socket', '$http',
             play: true
         });
 
+        $scope.menu.push({
+            name: 'Volleyball',
+            url: '/volleyball',
+            type: 'link',
+            icon: 'soccer',
+            live: false,
+        });
+
         getBrandingData();
 
         function getBrandingData() {
-            $http.get('http://127.0.0.1:3000/images/logo')
+            $http.get(api_root + '/images/logo')
             .then(function(response){
                 if (response.status == 200) {
                     $scope.logoUrl = response.data
                 }
             });
         }
+
+        // Clock functions
+        function getClockTime(){
+            if ($scope.clock == undefined) {
+                $scope.clock = []
+            }
+            $http.get(api_root + '/stopwatch/time')
+            .then(function(response){
+                if (response.status == 200) {
+                    $scope.clock.time = response.data
+                }
+            });
+        }
+
+        setInterval(getClockTime, data_timeout);
+
+        $scope.setClock = function(val) {
+            $http.post(api_root + '/stopwatch/set/', JSON.stringify({time: val}));
+        };
+
+        $scope.upClock = function() {
+            $http.post(api_root + '/stopwatch/count/up');
+        };
+
+        $scope.downClock = function() {
+            $http.post(api_root + '/stopwatch/count/down');
+        };
+
+        $scope.pauseClock = function() {
+            $http.post(api_root + '/stopwatch/pause');
+        };
+
+        $scope.stopClock = function() {
+            $http.post(api_root + '/stopwatch/stop');
+        };
+
+        $scope.resetClock = function() {
+            $http.post(api_root + '/stopwatch/reset');
+        };
     }
 ]);
 
@@ -149,7 +198,7 @@ app.controller('AppCtrl', ['$scope', '$location', 'socket', '$http',
  */
 app.config(['$routeProvider', 'localStorageServiceProvider',
     function($routeProvider, localStorageServiceProvider) {
-        localStorageServiceProvider.setPrefix('la1tv');
+        localStorageServiceProvider.setPrefix('rosesCG');
 
         $routeProvider
             .when("/general", {
@@ -197,20 +246,24 @@ app.config(['$routeProvider', 'localStorageServiceProvider',
                 controller: 'archeryCGController'
             })
             .when("/badminton", {
-              templateUrl: '/admin/templates/badminton.tmpl.html',
-              controller: 'badmintonCGController'
+                templateUrl: '/admin/templates/badminton.tmpl.html',
+                controller: 'badmintonCGController'
             })
             .when("/tennis", {
-              templateUrl: '/admin/templates/tennis.tmpl.html',
-              controller: 'tennisCGController'
+                templateUrl: '/admin/templates/tennis.tmpl.html',
+                controller: 'tennisCGController'
             })
             .when("/netball", {
-              templateUrl: '/admin/templates/netball.tmpl.html',
-              controller: 'netballCGController'
+                templateUrl: '/admin/templates/netball.tmpl.html',
+                controller: 'netballCGController'
             })
             .when("/waterpolo", {
-              templateUrl: '/admin/templates/waterpolo.tmpl.html',
-              controller: 'waterpoloCGController'
+                templateUrl: '/admin/templates/waterpolo.tmpl.html',
+                controller: 'waterpoloCGController'
+            })
+            .when("/volleyball", {
+                templateUrl: '/admin/templates/volleyball.tmpl.html',
+                controller: 'volleyballCGController'
             })
             .when("/volleyball", {
                 templateUrl: '/admin/templates/volleyball.tmpl.html',
@@ -220,97 +273,131 @@ app.config(['$routeProvider', 'localStorageServiceProvider',
     }
 ]);
 
-app.controller('archeryCGController', ['$scope', 'socket',
-  function($scope, socket) {
-      socket.on("archery", function (msg) {
-          $scope.archery = msg;
-          $scope.menu.forEach(item => {
-              if (item.name === 'Archery') {
-                  item.live = $scope.archery.show
-              }
-          })
-      });
+app.controller('archeryCGController', ['$scope', '$http',
+    function($scope, $http) {
 
-      $scope.$watch('archery', function() {
-          if ($scope.archery) {
-              socket.emit("archery", $scope.archery);
-          } else {
-              getArcheryData();
-          }
-      }, true);
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        getArcheryData();
+        /**
+         * Updates the API when $scope.archery changes.
+         */
+        $scope.$watch('archery', function() {
+            // If archery exists and changes are allowed.
+            if ($scope.archery && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/archery', $scope.archery).then($scope.lock = false);
+            }
+        }, true);
+
+        /**
+         * Gets data from API for $scope.archery.
+         */
+        function getArcheryData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock){
+                $http.get(api_root + '/sport/archery')
+                .then(function(response){
+                    // Check that request was successful and we didn't recieve an empty body.
+                    if (response.status == 200 && response.data) {
+                        // Check that changes are still not locked, and that the data returned is new.
+                        if (!$scope.lock && $scope.archery != response.data) {
+                            $scope.archery = response.data;
+
+                            archeryUpdated();
+                        }
+                    }
+                });
+            }
+        }
+
+        /**
+         * Should be called whenever $scope.archery is modified by the controller.
+         */
+        function archeryUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Archery') {
+                    item.live = $scope.archery.show
+                }
+            })
+        }
+
+        // Update data after every data timeout period.
+        setInterval(getArcheryData, data_timeout);
 
 
-      function getArcheryData() {
-          socket.emit("archery:get");
-      }
 
-      $scope.archeryReset1 = function() {
-          $scope.archery.score1 = 0;
-      };
+        $scope.archeryReset1 = function() {
+            $scope.archery.score1 = 0;
+        };
 
-      $scope.archeryHit1 = function(){
+        $scope.archeryHit1 = function(){
         if(!$scope.archery.shots1) {
             $scope.archery.shots1 = "";
         }
         if($scope.archery.shots1.length < 6) {
-          $scope.archery.shots1 += "H";
-          var tmp = Number($scope.archery.score1) || 0;
-          var newScore = (tmp + 1);
-          $scope.archery.score1 = newScore;
-          debugger
+            $scope.archery.shots1 += "H";
+            var tmp = Number($scope.archery.score1) || 0;
+            var newScore = (tmp + 1);
+            $scope.archery.score1 = newScore;
         }
-      }
+        }
 
-      $scope.archeryHit2 = function(){
+        $scope.archeryHit2 = function(){
         if(!$scope.archery.shots2) {
             $scope.archery.shots2 = "";
         }
         if($scope.archery.shots2.length < 6) {
-          $scope.archery.shots2 += "H";
-          var tmp = Number($scope.archery.score2) || 0;
-          var newScore = (tmp + 1);
-          $scope.archery.score2 = newScore;
+            $scope.archery.shots2 += "H";
+            var tmp = Number($scope.archery.score2) || 0;
+            var newScore = (tmp + 1);
+            $scope.archery.score2 = newScore;
         }
-      }
+        }
 
-      $scope.archeryMiss1 = function(){
+        $scope.archeryMiss1 = function(){
         if(!$scope.archery.shots1) {
             $scope.archery.shots1 = "";
         }
         if($scope.archery.shots1.length < 6) {
-          $scope.archery.shots1 += "M";
+            $scope.archery.shots1 += "M";
         }
-      }
+        }
 
-      $scope.archeryMiss2 = function(){
+        $scope.archeryMiss2 = function(){
         if(!$scope.archery.shots2) {
             $scope.archery.shots2 = "";
         }
         if($scope.archery.shots2.length < 6) {
-          $scope.archery.shots2 += "M";
+            $scope.archery.shots2 += "M";
         }
-      }
+        }
 
-      $scope.archeryReset2 = function() {
-          $scope.archery.score2 = 0;
-          $scope.archery.shots1 = [];
-          $scope.archery.shots2 = [];
-      };
+        $scope.archeryReset2 = function() {
+            $scope.archery.score2 = 0;
+            $scope.archery.shots1 = [];
+            $scope.archery.shots2 = [];
+        };
 
-      $scope.archeryHitsReset1 = function() {
-          $scope.archery.shots1 = "";
-      };
+        $scope.archeryHitsReset1 = function() {
+            $scope.archery.shots1 = "";
+        };
 
-      $scope.archeryHitsReset2 = function() {
-          $scope.archery.shots2 = "";
-      };
-  }
+        $scope.archeryHitsReset2 = function() {
+            $scope.archery.shots2 = "";
+        };
+    }
 ]);
 
 /**
  * General/ Bug.
  */
-app.controller('generalCGController', ['$scope', '$http', 
+app.controller('generalCGController', ['$scope', '$http',
     function($scope, $http){
 
         // Lock changes to the scope.
@@ -324,15 +411,9 @@ app.controller('generalCGController', ['$scope', '$http',
             if ($scope.bug && !$scope.lock) {
                 // Lock changed.
                 $scope.lock = true;
-                
-                // Send changes and unlock changes.
-                $http.post('http://127.0.0.1:3000/bug', $scope.bug).then($scope.lock = false);
 
-                // Request changes from API to confirm changes.
-                getBugData();
-            } else {
-                // Get data from API.
-                getBugData();
+                // Send changes and unlock changes.
+                $http.post(api_root + '/bug', $scope.bug).then($scope.lock = false);
             }
         }, true);
 
@@ -342,14 +423,14 @@ app.controller('generalCGController', ['$scope', '$http',
         function getBugData() {
             // Only get data if changes are not locked.
             if (!$scope.lock){
-                $http.get('http://127.0.0.1:3000/bug')
+                $http.get(api_root + '/bug')
                 .then(function(response){
                     // Check that request was successful and we didn't recieve an empty body.
                     if (response.status == 200 && response.data) {
                         // Check that changes are still not locked, and that the data returned is new.
                         if (!$scope.lock && $scope.bug != response.data) {
                             $scope.bug = response.data;
-                            
+
                             bugUpdated();
                         }
                     }
@@ -365,8 +446,8 @@ app.controller('generalCGController', ['$scope', '$http',
             $scope.menu.forEach(item => {
                 if (item.name === 'General') {
                     // Set item live status according to current settings.
-                    if ($scope.bug.showLogo === true || 
-                        ($scope.bug.showGeneral === true && ($scope.bug.showLocation === true || $scope.bug.showClock === true || $scope.bug.showLive === true))) 
+                    if ($scope.bug.showLogo === true ||
+                        ($scope.bug.showGeneral === true && ($scope.bug.showLocation === true || $scope.bug.showClock === true || $scope.bug.showLive === true)))
                     {
                         item.live = true
                     } else {
@@ -375,7 +456,7 @@ app.controller('generalCGController', ['$scope', '$http',
                 }
             })
         }
-        
+
         // Update data after every data timeout period.
         setInterval(getBugData, data_timeout);
     }
@@ -387,7 +468,7 @@ app.controller('generalCGController', ['$scope', '$http',
 app.controller('lowerThirdsCGController', ['$scope', 'localStorageService', '$http',
     function($scope, localStorageService, $http){
         $scope.queuedThirds = [];
-        
+
         // Load lower thirds from local storage.
         var stored = localStorageService.get('lower_thirds');
 
@@ -407,14 +488,14 @@ app.controller('lowerThirdsCGController', ['$scope', 'localStorageService', '$ht
                 $scope.lowerThird = {};
             }
         };
-        
+
         /**
          * Removes a lower third from the queue.
          */
         $scope.remove = function(index){
             $scope.queuedThirds.splice(index, 1);
         };
-        
+
         /**
          * Edits a lower third.
          */
@@ -430,42 +511,42 @@ app.controller('lowerThirdsCGController', ['$scope', 'localStorageService', '$ht
          * Shows a lower third.
          */
         $scope.show = function(side, item) {
-            $http.post('http://127.0.0.1:3000/lower-third/show/' + side, item);
+            $http.post(api_root + '/lower-third/show/' + side, item);
         };
 
         /**
          * Hides all lower thirds.
          */
         $scope.hideall = function() {
-            $http.post('http://127.0.0.1:3000/lower-third/hide/all')
+            $http.post(api_root + '/lower-third/hide/all')
         };
 
         /**
          * Hides the full lower third.
          */
         $scope.hidefull = function() {
-            $http.post('http://127.0.0.1:3000/lower-third/hide/full')
+            $http.post(api_root + '/lower-third/hide/full')
         };
 
         /**
          * Hides the left lower third.
          */
 		$scope.hideleft = function() {
-            $http.post('http://127.0.0.1:3000/lower-third/hide/left')
+            $http.post(api_root + '/lower-third/hide/left')
         };
 
         /**
          * Hide the right lower third.
          */
 		$scope.hideright = function() {
-            $http.post('http://127.0.0.1:3000/lower-third/hide/right')
+            $http.post(api_root + '/lower-third/hide/right')
         };
 
         /**
          * Gets all lower thirds from the API.
          */
         function getLowerThirds() {
-            $http.get('http://127.0.0.1:3000/lower-third')
+            $http.get(api_root + '/lower-third')
             .then(function(response) {
                 if (response.status == 200 && response.data) {
                     $scope.lowerThirds = response.data;
@@ -490,22 +571,30 @@ app.controller('lowerThirdsCGController', ['$scope', 'localStorageService', '$ht
 
         // Calls getLowerThirds once every data_timeout.
         setInterval(getLowerThirds, data_timeout)
+
+        $scope.$on("$destroy", function() {
+            localStorageService.set('lower_thirds', $scope.queuedThirds);
+        });
     }
 ]);
 
 /**
  * Grid.
  */
-app.controller('gridCGController', ['$scope', 'localStorageService', 'socket', '$http',
-    function($scope, localStorageService, socket, $http){
+app.controller('gridCGController', ['$scope', 'localStorageService', '$http',
+    function($scope, localStorageService, $http){
         // Initialise grid.
         $scope.grid = {};
         $scope.grid.rows = [];
+
 
         // Get stored grid.
         var stored = localStorageService.get('grid');
         if(stored !== null) {
             $scope.grid = stored;
+        } else {
+            // If we don't have a local copy, grab from the server.
+            getGrid();
         }
 
         /**
@@ -528,7 +617,7 @@ app.controller('gridCGController', ['$scope', 'localStorageService', 'socket', '
         $scope.show = function() {
             $scope.grid.show = true;
 
-            $http.post('http://127.0.0.1:3000/grid', $scope.grid);
+            $http.post(api_root + '/grid', $scope.grid);
         };
 
         /**
@@ -536,8 +625,8 @@ app.controller('gridCGController', ['$scope', 'localStorageService', 'socket', '
          */
         $scope.hide = function() {
             $scope.grid.show = false;
-            
-            $http.post('http://127.0.0.1:3000/grid', $scope.grid);
+
+            $http.post(api_root + '/grid', $scope.grid);
         };
 
         /**
@@ -551,80 +640,118 @@ app.controller('gridCGController', ['$scope', 'localStorageService', 'socket', '
          * Shows the color options.
          */
         $scope.showColorOptions = function() {
-          $scope.grid.colorShow = true
+            $scope.grid.colorShow = true
         }
 
         /**
          * Hides the color options.
          */
         $scope.hideColorOptions = function() {
-          $scope.grid.colorShow = false
+            $scope.grid.colorShow = false
         }
-}]);
 
-app.controller('boxingCGController', ['$scope', 'socket',
-    function($scope, socket){
-        socket.on("clock:tick", function (msg) {
-            $scope.clock = msg.slice(0, msg.indexOf("."));
-        });
-
-        $scope.pauseClock = function() {
-            socket.emit("clock:pause");
-        };
-
-        $scope.resetClock = function() {
-            socket.emit("clock:reset");
-        };
-
-        $scope.setClock = function(val) {
-            socket.emit("clock:set", val);
-        };
-
-        $scope.downClock = function() {
-            socket.emit("clock:down");
-        };
-
-        $scope.upClock = function() {
-            socket.emit("clock:up");
-        };
-
-        $scope.updateScore = function() {
-            console.log("Score");
-        };
-
-        $scope.roundChanged = function() {
-            console.log("Round");
-        };
-
-        socket.on("boxing", function (msg) {
-            $scope.boxing = msg;
-            $scope.menu.forEach(item => {
-                if (item.name === 'Boxing') {
-                    item.live = $scope.boxing.showScore
+        /**
+         * Gets grid data from API.
+         */
+        function getGrid() {
+            $http.get(api_root + '/grid')
+            .then(function(response) {
+                if (response.status == 200 && response.data) {
+                    $scope.grid = response.data;
                 }
             })
-        });
+        }
 
-        $scope.$watch('boxing', function() {
-            if ($scope.boxing) {
-                socket.emit("boxing", $scope.boxing);
-            } else {
-                getBoxingData();
+        function getGridLive() {
+            $http.get(api_root + '/grid')
+            .then(function(response) {
+                if (response.status == 200 && response.data) {
+                    $scope.grid.show = response.data.show;
+
+                    gridLiveUpdated();
+                }
+            })
+        }
+        /**
+         * Called after the grid data has been updated by getGrid.
+         */
+        function gridLiveUpdated() {
+
+            $scope.menu.forEach(item => {
+                if (item.name === 'Grid') {
+                    item.live = $scope.grid.show;
+                }
+            })
+        }
+
+        // Calls getGrid once every data_timeout.
+        setInterval(getGridLive, data_timeout)
+}]);
+
+app.controller('boxingCGController', ['$scope', '$http',
+    function ($scope, $http) {
+
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        /**
+         * Updates the API when $scope.boxing changes.
+         */
+        $scope.$watch('boxing', function () {
+            // If boxing exists and changes are allowed.
+            if ($scope.boxing && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/boxing', $scope.boxing).then($scope.lock = false);
             }
         }, true);
 
+        /**
+         * Gets data from API for $scope.boxing
+         */
         function getBoxingData() {
-            socket.emit("boxing:get");
-            socket.emit("clock:get");
+            // Only get data if changes are not locked.
+            if (!$scope.lock) {
+                $http.get(api_root + '/sport/boxing')
+                    .then(function (response) {
+                        // Check that request was successful and we didn't recieve an empty body.
+                        if (response.status == 200 && response.data) {
+                            // Check that changes are still not locked, and that the data returned is new.
+                            if (!$scope.lock && $scope.boxing != response.data) {
+                                $scope.boxing = response.data;
+                                boxingUpdated();
+                            }
+                        }
+                    });
+            }
         }
+
+        /**
+         * Should be called whenever $scope.boxing is modified by the controller.
+         */
+        function boxingUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Boxing') {
+                    // Set item live status according to current settings.
+                    item.live = $scope.boxing.showScore
+                }
+            })
+        }
+
+        // Update data after every data timeout period.
+        setInterval(getBoxingData, data_timeout);
+
     }
 ]);
 
 /**
  * Roses/ overall score.
  */
-app.controller('rosesCGController', ['$scope', 'socket', '$http', 
-    function($scope, socket, $http) {
+app.controller('rosesCGController', ['$scope', '$http',
+    function($scope, $http) {
         $scope.roses = {}
 
         /**
@@ -632,7 +759,7 @@ app.controller('rosesCGController', ['$scope', 'socket', '$http',
          */
         $scope.$watch('roses', function() {
             if($scope.roses) {
-                $http.post('http://127.0.0.1:3000/roses', $scope.roses);
+                $http.post(api_root + '/roses', $scope.roses);
             }
         })
 
@@ -649,33 +776,37 @@ app.controller('rosesCGController', ['$scope', 'socket', '$http',
                         'Content-Type': 'application/json',
                     }
                 }
-                
+
                 // Get score.
                 $http.get('https://roseslive.co.uk/score.json', config)
-                .success(function(data) {
-                    // Check roses live is being sensible.
-                    if(isNaN(data.york) || isNaN(data.lancs)){
-                        console.log("Roses live is giving us nonsense");
-                        return;
-                    };
-                    
-                    // Set scores.
-                    $scope.roses.yorkScore = data.york;
-                    $scope.roses.lancScore = data.lancs;
+                .then(function(response) {
+                    if (response.status == 200 && response.data) {
+                        // Check roses live is being sensible.
+                        if(isNaN(response.data.york) || isNaN(response.data.lancs)){
+                            console.log("Roses live is giving us nonsense");
+                            return;
+                        };
 
-                    // Work out each team's progress towards a win.
-                    calculateProgress();
+                        // Set scores.
+                        $scope.roses.yorkScore = response.data.york;
+                        $scope.roses.lancScore = response.data.lancs;
 
-                    // Send scores to API.
-                    $http.post('http://127.0.0.1:3000/roses', $scope.roses);
+                        // Work out each team's progress towards a win.
+                        calculateProgress();
+
+                        // Send scores to API.
+                        $http.post(api_root + '/roses', $scope.roses);
+                        rosesUpdated();
+                    }
                 })
             } else {
                 // Work out progress based on manual scores.
                 calculateProgress();
 
                 // Send scores to API.
-                $http.post('http://127.0.0.1:3000/roses', $scope.roses).then(function (response) {
+                $http.post(api_root + '/roses', $scope.roses).then(function (response) {
                     getRosesData();
+                    rosesUpdated();
                 });
             }
         }
@@ -691,8 +822,8 @@ app.controller('rosesCGController', ['$scope', 'socket', '$http',
             }
 
             // Work out progress and format values.
-			$scope.roses.yorkProgress = (($scope.roses.yorkScore / $scope.roses.pointsToWin)*100).toFixed(2);
-			$scope.roses.lancProgress = (($scope.roses.lancScore / $scope.roses.pointsToWin)*100).toFixed(2);
+            $scope.roses.yorkProgress = (($scope.roses.yorkScore / $scope.roses.pointsToWin)*100).toFixed(2);
+            $scope.roses.lancProgress = (($scope.roses.lancScore / $scope.roses.pointsToWin)*100).toFixed(2);
             $scope.roses.pointsToWin = $scope.roses.pointsToWin.toFixed(1);
         }
 
@@ -700,24 +831,97 @@ app.controller('rosesCGController', ['$scope', 'socket', '$http',
          * Gets scores/ graphics settings from API.
          */
         function getRosesData() {
-            $http.get('http://127.0.0.1:3000/roses')
+            $http.get(api_root + '/roses')
             .then(function(response) {
                 if (response.status == 200 && response.data) {
                     $scope.roses = response.data;
                 }
             })
         }
-        
+
         // Get roses from API.
         getRosesData();
 
         // Get scores once every timeout period.
         setInterval(getRoses, data_timeout)
+
+        function rosesUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Roses') {
+                    if ($scope.roses.showScore === true || $scope.roses.showProgress === true) {
+                        item.live = true
+                    } else {
+                        item.live = false
+                    }
+                }
+            })
+        }
     }
 ]);
 
-app.controller('footballCGController', ['$scope', 'localStorageService', 'socket',
-    function($scope, localStorageService, socket){
+app.controller('footballCGController', ['$scope', 'localStorageService', '$http',
+    function($scope, localStorageService, $http){
+
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        // Get the default values from server on load.
+        getFootballData();
+
+        /**
+         * Updates the API when $scope.football changes.
+         */
+        $scope.$watch('football', function() {
+            // If scope exists and changes are allowed.
+            if ($scope.football && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/football', $scope.football).then($scope.lock = false);
+            }
+        }, true);
+
+        /**
+         * Gets data from API for $scope.football
+         */
+        function getFootballData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock) {
+                $http.get(api_root + '/sport/football')
+                    .then(function (response) {
+                        // Check that request was successful and we didn't recieve an empty body.
+                        if (response.status == 200 && response.data) {
+                            // Check that changes are still not locked, and that the data returned is new.
+                            if (!$scope.lock && $scope.football != response.data) {
+                                $scope.football = response.data;
+                                footballUpdated();
+                            }
+                        }
+                    });
+            }
+        }
+
+        // Update data after every data timeout period.
+        setInterval(getFootballData, data_timeout);
+
+        /**
+         * Should be called whenever $scope.boxing is modified by the controller.
+         */
+        function footballUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Football') {
+                    if ($scope.football.show === true || $scope.football.showpre === true || $scope.football.showpost === true ) {
+                        item.live = true
+                    } else {
+                        item.live = false
+                    }
+                }
+            })
+        }
+
         var storedHome = localStorageService.get('home_football');
         var storedAway = localStorageService.get('away_football');
 
@@ -732,30 +936,6 @@ app.controller('footballCGController', ['$scope', 'localStorageService', 'socket
         } else {
             $scope.awayPlayers = storedAway;
         }
-
-        socket.on("clock:tick", function (msg) {
-            $scope.clock = msg.slice(0, msg.indexOf("."));
-        });
-
-        $scope.pauseClock = function() {
-            socket.emit("clock:pause");
-        };
-
-        $scope.resetClock = function() {
-            socket.emit("clock:reset");
-        };
-
-        $scope.setClock = function(val) {
-            socket.emit("clock:set", val);
-        };
-
-        $scope.downClock = function() {
-            socket.emit("clock:down");
-        };
-
-        $scope.upClock = function() {
-            socket.emit("clock:up");
-        };
 
         $scope.addHomePlayer = function() {
             $scope.homePlayers.push($scope.home);
@@ -776,149 +956,131 @@ app.controller('footballCGController', ['$scope', 'localStorageService', 'socket
             }
         };
 
-        socket.on("football", function (msg) {
-            $scope.football = msg;
-            $scope.menu.forEach(item => {
-                if (item.name === 'Football') {
-                    if ($scope.football.show === true || $scope.football.showpre === true || $scope.football.showpost === true ) {
-                        item.live = true
-                    } else {
-                        item.live = false
-                    }
-                }
-            })
-        });
-
-        $scope.$watch('football', function() {
-            if ($scope.football) {
-                socket.emit("football", $scope.football);
-            } else {
-                getFootballData();
-            }
-        }, true);
-
         $scope.$on("$destroy", function() {
             localStorageService.set('away_football', $scope.awayPlayers);
             localStorageService.set('home_football', $scope.homePlayers);
         });
 
-        function getFootballData() {
-            socket.emit("football:get");
-            socket.emit("clock:get");
-        }
     }
 ]);
 
-app.controller('rugbyCGController', ['$scope', 'localStorageService', 'socket',
-    function($scope, localStorageService, socket){
-        var storedHome = localStorageService.get('home_rugby');
-        var storedAway = localStorageService.get('away_rugby');
+app.controller('rugbyCGController', ['$scope', 'localStorageService', '$http',
+    function($scope, localStorageService, $http){
 
-        if(storedHome === null) {
-            $scope.homePlayers = [];
-        } else {
-            $scope.homePlayers = storedHome;
-        }
+        // Lock changes to the scope.
+        $scope.lock = false;
 
-        if(storedAway === null) {
-            $scope.awayPlayers = [];
-        } else {
-            $scope.awayPlayers = storedAway;
-        }
+        // Get the default values from server on load.
+        getRugbyData();
 
-        socket.on("clock:tick", function (msg) {
-            $scope.clock = msg.slice(0, msg.indexOf("."));
-        });
-
-        $scope.pauseClock = function() {
-            socket.emit("clock:pause");
-        };
-
-        $scope.resetClock = function() {
-            socket.emit("clock:reset");
-        };
-
-        $scope.setClock = function(val) {
-            socket.emit("clock:set", val);
-        };
-
-        $scope.downClock = function() {
-            socket.emit("clock:down");
-        };
-
-        $scope.upClock = function() {
-            socket.emit("clock:up");
-        };
-
-        $scope.addHomePlayer = function() {
-            $scope.homePlayers.push($scope.home);
-            $scope.home = {};
-        };
-
-        $scope.addAwayPlayer = function() {
-            $scope.awayPlayers.push($scope.away);
-            $scope.away = {};
-        };
-
-        $scope.delete = function(team, index) {
-            if(team === 'away') {
-                $scope.awayPlayers.splice(index, 1);
-            } else if (team === 'home') {
-                $scope.homePlayers.splice(index, 1);
-            }
-        };
-
-        socket.on("rugby", function (msg) {
-            $scope.rugby = msg;
-            $scope.menu.forEach(item => {
-                if (item.name === 'rugby') {
-                    item.live = $scope.rugby.show
-                }
-            })
-        });
-
+        /**
+         * Updates the API when $scope.rugby changes.
+         */
         $scope.$watch('rugby', function() {
-            if ($scope.rugby) {
-                socket.emit("rugby", $scope.rugby);
-            } else {
-                getRugbyData();
+            // If scope exists and changes are allowed.
+            if ($scope.rugby && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/rugby', $scope.rugby).then($scope.lock = false);
             }
         }, true);
 
-        $scope.$on("$destroy", function() {
-            localStorageService.set('away_rugby', $scope.awayPlayers);
-            localStorageService.set('home_rugby', $scope.homePlayers);
-        });
-
+        /**
+         * Gets data from API for $scope.rugby
+         */
         function getRugbyData() {
-            socket.emit("rugby:get");
-            socket.emit("clock:get");
+            // Only get data if changes are not locked.
+            if (!$scope.lock) {
+                $http.get(api_root + '/sport/rugby')
+                    .then(function (response) {
+                        // Check that request was successful and we didn't recieve an empty body.
+                        if (response.status == 200 && response.data) {
+                            // Check that changes are still not locked, and that the data returned is new.
+                            if (!$scope.lock && $scope.rugby != response.data) {
+                                $scope.rugby = response.data;
+                                rugbyUpdated();
+                            }
+                        }
+                    });
+            }
+        }
+
+        // Update data after every data timeout period.
+        setInterval(getRugbyData, data_timeout);
+
+        /**
+         * Should be called whenever $scope.rugby is modified by the controller.
+         */
+        function rugbyUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Rugby') {
+                    item.live = $scope.rugby.show
+                }
+            })
         }
     }
 ]);
 
-app.controller('dartsCGController', ['$scope', 'socket',
-    function($scope, socket) {
-        socket.on("darts", function (msg) {
-            $scope.darts = msg;
+app.controller('dartsCGController', ['$scope', '$http',
+    function($scope, $http) {
+
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        // Get the default values from server on load.
+        getDartsData();
+
+        /**
+         * Updates the API when $scope.darts changes.
+         */
+        $scope.$watch('darts', function() {
+            // If scope exists and changes are allowed.
+            if ($scope.darts && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/darts', $scope.darts).then($scope.lock = false);
+            }
+        }, true);
+
+        /**
+         * Gets data from API for $scope.darts
+         */
+        function getDartsData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock) {
+                $http.get(api_root + '/sport/darts')
+                    .then(function (response) {
+                        // Check that request was successful and we didn't recieve an empty body.
+                        if (response.status == 200 && response.data) {
+                            // Check that changes are still not locked, and that the data returned is new.
+                            if (!$scope.lock && $scope.darts != response.data) {
+                                $scope.darts = response.data;
+                                dartsUpdated();
+                            }
+                        }
+                    });
+            }
+        }
+
+        // Update data after every data timeout period.
+        setInterval(getDartsData, data_timeout);
+
+        /**
+         * Should be called whenever $scope.darts is modified by the controller.
+         */
+        function dartsUpdated() {
+            // Find the item in the menu.
             $scope.menu.forEach(item => {
                 if (item.name === 'Darts') {
                     item.live = $scope.darts.show
                 }
             })
-        });
-
-        $scope.$watch('darts', function() {
-            if ($scope.darts) {
-                socket.emit("darts", $scope.darts);
-            } else {
-                getDartData();
-            }
-        }, true);
-
-        function getDartData() {
-            socket.emit("darts:get");
-        }
+        };
 
         $scope.reset1 = function() {
             $scope.darts.score1 = 501;
@@ -926,6 +1088,16 @@ app.controller('dartsCGController', ['$scope', 'socket',
 
         $scope.reset2 = function() {
             $scope.darts.score2 = 501;
+        };
+
+        $scope.set1 = function(val) {
+            $scope.darts.score1 = val;
+            $scope.last1 = "";
+        };
+
+        $scope.set2 = function(val) {
+            $scope.darts.score2 = val;
+            $scope.last2 = "";
         };
 
         $scope.take1 = function(val) {
@@ -960,33 +1132,16 @@ app.controller('dartsCGController', ['$scope', 'socket',
     }
 ]);
 
-app.controller('swimmingCGController', ['$scope', 'socket',
-    function($scope, socket) {
-        socket.on("clock:tick", function (msg) {
-            $scope.clock = msg.replace(/^0/, '');
-        });
-
-        $scope.pauseClock = function() {
-            socket.emit("clock:pause");
-        };
-
-        $scope.resetClock = function() {
-            socket.emit("clock:reset");
-        };
-
-        $scope.setClock = function(val) {
-            socket.emit("clock:set", val);
-        };
-
-        $scope.downClock = function() {
-            socket.emit("clock:down");
-        };
-
-        $scope.upClock = function() {
-            socket.emit("clock:up");
-        };
+app.controller('swimmingCGController', ['$scope', '$http',
+    function($scope, $http) {
 
         $scope.resetLanes = function() {
+            $scope.swimming.showclock = false;
+            $scope.swimming.showlist = false;
+            setTimeout($scope.emptyLanes, data_timeout + 500);
+        }
+
+        $scope.emptyLanes = function() {
             for (var i = 0; i < 8; i++){
                 $scope.swimming.lanes[i] = {
                     id: i,
@@ -994,6 +1149,7 @@ app.controller('swimmingCGController', ['$scope', 'socket',
                     team: ""
                 };
             }
+            $scope.resetOrder();
         };
 
         $scope.resetOrder = function() {
@@ -1002,17 +1158,34 @@ app.controller('swimmingCGController', ['$scope', 'socket',
             $scope.swimming.prevOrderLength = 0;
         };
 
-        socket.on("swimming", function (msg) {
-            $scope.swimming = msg;
-        });
+        $scope.submitDistance = function() {
+            $scope.swimming.showdistance = false;
+            console.log("running")
+            setTimeout($scope.showNewDistance, data_timeout + 500);
+        }
 
+        $scope.showNewDistance = function() {
+            console.log("also running")
+            $scope.swimming.distance = $scope.swimming.distanceTemp;
+            $scope.swimming.showdistance = true;
+        }
+
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        // Get the default values from server on load.
+        getSwimmingData();
+
+        /**
+         * Updates the API when $scope.swimming changes.
+         */
         $scope.$watch('swimming', function() {
             if ($scope.swimming) {
-                if($scope.swimming.prevOrderLength < $scope.swimming.order.length){                    
+                if($scope.swimming.prevOrderLength < $scope.swimming.order.length){
                     for (var i = $scope.swimming.prevOrderLength; i < Math.min($scope.swimming.order.length, 8); i++){
                         $scope.swimming.laneOrder[i] = {
                             lane: $scope.swimming.lanes[$scope.swimming.order[i] - 1],
-                            time: $scope.clock
+                            time: $scope.clock.time
                         };
                     }
 
@@ -1022,203 +1195,284 @@ app.controller('swimmingCGController', ['$scope', 'socket',
                 if($scope.swimming.order.length > 0){
 
                 }
+            }
+            // If scope exists and changes are allowed.
+            if ($scope.swimming && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
 
-                socket.emit("swimming", $scope.swimming);
-            } else {
-                getSwimmingData();
+                // If we are displaying the starting/results list, we don't want a clock and splits
+                // they'll just overlap each other.
+                if ($scope.swimming.showlist === true) {
+                    $scope.swimming.showsplits = false;
+                    $scope.swimming.showclock = false;
+                    $scope.resetClock();
+                    $scope.stopClock();
+                }
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/swimming', $scope.swimming).then($scope.lock = false);
             }
         }, true);
 
+        /**
+         * Gets data from API for $scope.swimming
+         */
         function getSwimmingData() {
-            socket.emit("swimming:get");
-            socket.emit("clock:get");
-        }
-    }
-]);
-
-app.controller('basketballCGController', ['$scope', 'localStorageService', 'socket',
-    function($scope, localStorageService, socket){
-        var storedHome = localStorageService.get('home_basketball');
-        var storedAway = localStorageService.get('away_basketball');
-
-        if(storedHome === null) {
-            $scope.homePlayers = [];
-        } else {
-            $scope.homePlayers = storedHome;
-        }
-
-        if(storedAway === null) {
-            $scope.awayPlayers = [];
-        } else {
-            $scope.awayPlayers = storedAway;
-        }
-
-        socket.on("clock:tick", function (msg) {
-            $scope.clock = msg.slice(0, msg.indexOf("."));
-        });
-
-        $scope.pauseClock = function() {
-            socket.emit("clock:pause");
-        };
-
-        $scope.resetClock = function() {
-            socket.emit("clock:reset");
-        };
-
-        $scope.setClock = function(val) {
-            socket.emit("clock:set", val);
-        };
-
-        $scope.downClock = function() {
-            socket.emit("clock:down");
-        };
-
-        $scope.upClock = function() {
-            socket.emit("clock:up");
-        };
-
-        $scope.addHomePlayer = function() {
-            $scope.homePlayers.push($scope.home);
-            $scope.home = {};
-        };
-
-        $scope.addAwayPlayer = function() {
-            $scope.awayPlayers.push($scope.away);
-            $scope.away = {};
-        };
-
-        $scope.delete = function(team, index) {
-            console.log('delete');
-            if(team === 'away') {
-                $scope.awayPlayers.splice(index, 1);
-            } else if (team === 'home') {
-                $scope.homePlayers.splice(index, 1);
+            // Only get data if changes are not locked.
+            if (!$scope.lock) {
+                $http.get(api_root + '/sport/swimming')
+                    .then(function (response) {
+                        // Check that request was successful and we didn't recieve an empty body.
+                        if (response.status == 200 && response.data) {
+                            // Check that changes are still not locked, and that the data returned is new.
+                            // Angular adds $$hashkey for repeated html elements (like the swim lanes here)
+                            // This causes the hashes to be different on every update. toJSON removes these for actual comparison.
+                            if (!$scope.lock && angular.toJson($scope.swimming) != angular.toJson(response.data)) {
+                                $scope.swimming = response.data;
+                            }
+                            swimmingUpdated();
+                        }
+                    });
             }
-        };
-
-        socket.on("basketball", function (msg) {
-            $scope.basketball = msg;
-            $scope.menu.forEach(item => {
-                if (item.name === 'basketball') {
-                    item.live = $scope.basketball.show
-                }
-            })
-        });
-
-        $scope.$watch('basketball', function() {
-            if ($scope.basketball) {
-                socket.emit("basketball", $scope.basketball);
-            } else {
-                getBasketballData();
-            }
-        }, true);
-
-        $scope.$on("$destroy", function() {
-            localStorageService.set('away_basketball', $scope.awayPlayers);
-            localStorageService.set('home_basketball', $scope.homePlayers);
-        });
-
-        function getBasketballData() {
-            socket.emit("basketball:get");
-            socket.emit("clock:get");
         }
-    }
-]);
 
-app.controller('badmintonCGController', ['$scope', 'socket',
-    function($scope, socket) {
-        socket.on("badminton", function (msg) {
-            $scope.badminton = msg;
+        // Update data after every data timeout period.
+        setInterval(getSwimmingData, data_timeout);
+
+        /**
+         * Should be called whenever $scope.swimming is modified by the controller.
+         */
+        function swimmingUpdated() {
+            // Find the item in the menu.
             $scope.menu.forEach(item => {
-                if (item.name === 'Badminton') {
-                    item.live = $scope.badminton.show
-                }
-            })
-        });
-
-        $scope.resetGame1 = function() {
-          $scope.badminton.game1 = 0;
-        };
-
-        $scope.resetGame2 = function() {
-          $scope.badminton.game2 = 0;
-        };
-
-        $scope.resetPoint1 = function() {
-          $scope.badminton.point1 = 0;
-        };
-
-        $scope.resetPoint2 = function() {
-          $scope.badminton.point2 = 0;
-        };
-
-        $scope.$watch('badminton', function() {
-            if ($scope.badminton) {
-                socket.emit("badminton", $scope.badminton);
-            } else {
-                getBadmintonData();
-            }
-        }, true);
-
-        function getBadmintonData() {
-            socket.emit("badminton:get");
-        }
-    }
-]);
-
-app.controller('tennisCGController', ['$scope', 'socket',
-    function($scope, socket) {
-        // to make maths easier, we'll calculate points linearly and then map them to this array of tennis scores. Arrays start at 0!
-        var pointNames = ['0', '15', '30', '40', 'AD']
-
-        // usual functions to recieve/send data to the server
-        socket.on("tennisOptions", function (msg) {
-            $scope.tennisOptions = msg;
-            $scope.menu.forEach(item => {
-                if (item.name === 'Tennis') {
-                    if ($scope.tennisOptions.showScore === true || $scope.tennisOptions.showSets === true || $scope.tennisOptions.showStats === true) {
+                if (item.name === 'Swimming') {
+                    if (
+                        $scope.swimming.showclock === true
+                        || $scope.swimming.showlist === true
+                        || $scope.swimming.showsplits === true
+                    ) {
                         item.live = true
                     } else {
                         item.live = false
                     }
                 }
             })
-        });
+        }
 
-        socket.on("tennisScore", function (msg) {
-            $scope.tennisScore = msg;
-        });
 
-        $scope.$watch('tennisOptions', function() {
-            if ($scope.tennisOptions) {
-				if (($scope.tennisOptions.matchName).includes("Mixed")) {
-					$scope.tennisOptions.player1 = socket.emit("teamName:home");
-					$scope.tennisOptions.player2 = socket.emit("teamName:away");
-				}else{
-                    socket.emit("tennisOptions", $scope.tennisOptions);
+    }
+]);
+
+app.controller('basketballCGController', ['$scope', '$http',
+    function($scope, $http){
+
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        getBasketballData();
+
+        /**
+         * Updates the API when $scope.basketball changes.
+         */
+        $scope.$watch('basketball', function() {
+            // If basketball exists and changes are allowed.
+            if ($scope.basketball && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/basketball', $scope.basketball).then($scope.lock = false);
+            }
+        }, true);
+
+        /**
+         * Gets data from API for $scope.basketball.
+         */
+        function getBasketballData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock){
+                $http.get(api_root + '/sport/basketball')
+                .then(function(response){
+                    // Check that request was successful and we didn't recieve an empty body.
+                    if (response.status == 200 && response.data) {
+                        // Check that changes are still not locked, and that the data returned is new.
+                        if (!$scope.lock && $scope.basketball != response.data) {
+                            $scope.basketball = response.data;
+
+                            basketballUpdated();
+                        }
+                    }
+                });
+            }
+        }
+
+        /**
+         * Should be called whenever $scope.basketball is modified by the controller.
+         */
+        function basketballUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Basketball') {
+                    item.live = $scope.basketball.show
                 }
-            } else {
-                getTennisData();
+            })
+        }
+
+        // Update data after every data timeout period.
+        setInterval(getBasketballData, data_timeout);
+    }
+]);
+
+app.controller('badmintonCGController', ['$scope', '$http',
+    function($scope, $http) {
+
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        /**
+         * Updates the API when $scope.badminton changes.
+         */
+        $scope.$watch('badminton', function() {
+            // If badminton exists and changes are allowed.
+            if ($scope.badminton && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/badminton', $scope.badminton).then($scope.lock = false);
             }
         }, true);
 
-        socket.on("teamName:home", function(msg){
-            $scope.tennisOptions.homeTeam = msg;
-            socket.emit("tennisOptions", $scope.tennisOptions);
-        });
+        /**
+         * Gets data from API for $scope.badminton.
+         */
+        function getBadmintonData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock){
+                $http.get(api_root + '/sport/badminton')
+                .then(function(response){
+                    // Check that request was successful and we didn't recieve an empty body.
+                    if (response.status == 200 && response.data) {
+                        // Check that changes are still not locked, and that the data returned is new.
+                        if (!$scope.lock && $scope.badminton != response.data) {
+                            $scope.badminton = response.data;
+                            badmintonUpdated();
+                        }
+                    }
+                });
+            }
+        }
 
-        socket.on("teamName:away", function(msg){
-            $scope.tennisOptions.awayTeam = msg;
-            socket.emit("tennisOptions", $scope.tennisOptions);
-        });
+        /**
+         * Should be called whenever $scope.badminton is modified by the controller.
+         */
+        function badmintonUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Badminton') {
+                    // Set item live status according to current settings.
+                    item.live = $scope.badminton.show
+                }
+            })
+        }
 
-        $scope.$watch('tennisScore', function() {
-            if ($scope.tennisScore) {
-                socket.emit("tennisScore", $scope.tennisScore);
-            } else {
-                getTennisData();
+        // Update data after every data timeout period.
+        setInterval(getBadmintonData, data_timeout);
+
+        $scope.resetGame1 = function() {
+            $scope.badminton.game1 = 0;
+        };
+
+        $scope.resetGame2 = function() {
+            $scope.badminton.game2 = 0;
+        };
+
+        $scope.resetPoint1 = function() {
+            $scope.badminton.point1 = 0;
+        };
+
+        $scope.resetPoint2 = function() {
+            $scope.badminton.point2 = 0;
+        };
+    }
+]);
+
+app.controller('tennisCGController', ['$scope', '$http',
+    function($scope, $http) {
+
+
+        // to make maths easier, we'll calculate points linearly and then map them to this array of tennis scores. Arrays start at 0!
+        var pointNames = ['0', '15', '30', '40', 'AD']
+
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        getTennisData();
+
+        setInterval(getTennisData, data_timeout);
+
+        /**
+         * Gets data from API for $scope.tennis.
+         */
+        function getTennisData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock){
+                $http.get(api_root + '/sport/tennis')
+                .then(function(response){
+                    // Check that request was successful and we didn't recieve an empty body.
+                    if (response.status == 200 && response.data) {
+                        // Check that changes are still not locked, and that the data returned is new.
+                        if (!$scope.lock && $scope.tennis != response.data) {
+                            $scope.tennis = response.data;
+
+                            tennisUpdated();
+                        }
+                    }
+                });
+            }
+        }
+
+
+        /**
+         * Should be called whenever $scope.tennis is modified by the controller.
+         */
+        function tennisUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Tennis') {
+                    if (
+                        $scope.tennis.options.showSets === true
+                        || $scope.tennis.options.showScore === true
+                        || $scope.tennis.options.showStats === true
+                    ) {
+                        item.live = true;
+                    } else {
+                        item.live = false;
+                    }
+                }
+            })
+        }
+
+
+
+        $scope.$watch('tennis', function() {
+            if ($scope.tennis && !$scope.lock) {
+
+                // Lock changed.
+                $scope.lock = true;
+
+                if (($scope.tennis.options.matchName).includes("Mixed")) {
+                    $scope.tennis.options.player1 = $scope.tennis.options.homeTeam;
+                    $scope.tennis.options.player2 = $scope.tennis.options.awayTeam;
+                }
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/tennis', $scope.tennis).then($scope.lock = false);
+
             }
         }, true);
+
 
         // point scoring function - does all the complicated math for the user
         $scope.scorePoint = function(player) {
@@ -1226,62 +1480,62 @@ app.controller('tennisCGController', ['$scope', 'socket',
             var opponent = (player == 1 ? 2 : 1);
 
             // increment number of serves for server by 1
-            $scope.tennisScore['pointsServed' + $scope.tennisScore.server] ++;
+            $scope.tennis.score['pointsServed' + $scope.tennis.score.server] ++;
 
             // if player was server, update serves won
-            if (player == $scope.tennisScore.server) {
-                if ($scope.tennisScore.firstFault) {
-                    $scope.tennisScore['secondServeWon' + player] ++;
+            if (player == $scope.tennis.score.server) {
+                if ($scope.tennis.score.firstFault) {
+                    $scope.tennis.score['secondServeWon' + player] ++;
                 } else {
-                    $scope.tennisScore['firstServeWon' + player] ++;
+                    $scope.tennis.score['firstServeWon' + player] ++;
                 }
             }
 
             // clear any faults
-            $scope.tennisScore.firstFault = false;
+            $scope.tennis.score.firstFault = false;
 
-            if ($scope.tennisScore.tiebreak == true) {
+            if ($scope.tennis.score.tiebreak == true) {
                 // tiebreak
-                if ($scope.tennisScore['point' + player] >= 6 && ($scope.tennisScore['point' + player] - $scope.tennisScore['point' + opponent]) >= 1) {
+                if ($scope.tennis.score['point' + player] >= 6 && ($scope.tennis.score['point' + player] - $scope.tennis.score['point' + opponent]) >= 1) {
                     // player already won at least 6 points, and now has 2 point advantage, so wins game
                     winGame(player);
                 } else {
-                    $scope.tennisScore['point' + player] ++;
-                    $scope.tennisScore.pointName1 = $scope.tennisScore.point1;
-                    $scope.tennisScore.pointName2 = $scope.tennisScore.point2;
+                    $scope.tennis.score['point' + player] ++;
+                    $scope.tennis.score.pointName1 = $scope.tennis.score.point1;
+                    $scope.tennis.score.pointName2 = $scope.tennis.score.point2;
 
                     // change server after every odd-numbered point played
-                    if ((($scope.tennisScore['point' + player] + $scope.tennisScore['point' + opponent]) % 2) == 1) {
+                    if ((($scope.tennis.score['point' + player] + $scope.tennis.score['point' + opponent]) % 2) == 1) {
                         $scope.toggleServer();
                     }
                 }
             } else {
                 // normal game
-                if ($scope.tennisScore['point' + player] >= 3 && $scope.tennisScore['point' + opponent] >= 3) {
+                if ($scope.tennis.score['point' + player] >= 3 && $scope.tennis.score['point' + opponent] >= 3) {
                     // duece or advantage
-                    if ($scope.tennisScore['point' + opponent] == 4) {
+                    if ($scope.tennis.score['point' + opponent] == 4) {
                         // opponent had advantage, so score now duece
-                        $scope.tennisScore['point' + opponent] = 3;
-                    } else if ($scope.tennisScore['point' + player] == 4) {
+                        $scope.tennis.score['point' + opponent] = 3;
+                    } else if ($scope.tennis.score['point' + player] == 4) {
                         // player had advantage, so wins game
                         winGame(player);
                     } else {
                         // was duece, so player now has advantage
-                        $scope.tennisScore['point' + player] = 4;
+                        $scope.tennis.score['point' + player] = 4;
                     }
-                } else if ($scope.tennisScore['point' + player] == 3) {
+                } else if ($scope.tennis.score['point' + player] == 3) {
                     // player had 40, opponent 30 or less, so player wins game
                     winGame(player);
                 } else {
                     // player had 30 or less, so add a point
-                    $scope.tennisScore['point' + player] ++;
+                    $scope.tennis.score['point' + player] ++;
                 }
-                $scope.tennisScore.pointName1 = pointNames[$scope.tennisScore.point1];
-                $scope.tennisScore.pointName2 = pointNames[$scope.tennisScore.point2];
+                $scope.tennis.score.pointName1 = pointNames[$scope.tennis.score.point1];
+                $scope.tennis.score.pointName2 = pointNames[$scope.tennis.score.point2];
             }
 
-            $scope.tennisScore.pointsPlayed ++;
-            $scope.tennisScore['pointsWon' + player] ++;
+            $scope.tennis.score.pointsPlayed ++;
+            $scope.tennis.score['pointsWon' + player] ++;
 
             checkTiebreak();
             checkGamePoint(player);
@@ -1289,24 +1543,24 @@ app.controller('tennisCGController', ['$scope', 'socket',
 
         // ace point
         $scope.acePoint = function() {
-            $scope.tennisScore['ace' + $scope.tennisScore.server] ++;
-            $scope.scorePoint($scope.tennisScore.server);
+            $scope.tennis.score['ace' + $scope.tennis.score.server] ++;
+            $scope.scorePoint($scope.tennis.score.server);
         };
 
         // fault
         $scope.faultPoint = function() {
-            if ($scope.tennisScore.firstFault) {
+            if ($scope.tennis.score.firstFault) {
                 // double fault
-                $scope.tennisScore['singleFault' + $scope.tennisScore.server] --;
-                $scope.tennisScore['doubleFault' + $scope.tennisScore.server] ++;
+                $scope.tennis.score['singleFault' + $scope.tennis.score.server] --;
+                $scope.tennis.score['doubleFault' + $scope.tennis.score.server] ++;
 
                 // opponent scores a point
-                var opponent = ($scope.tennisScore.server == 1 ? 2 : 1);
+                var opponent = ($scope.tennis.score.server == 1 ? 2 : 1);
                 $scope.scorePoint(opponent);
             } else {
                 // first fault - set it to true
-                $scope.tennisScore.firstFault = true;
-                $scope.tennisScore['singleFault' + $scope.tennisScore.server] ++;
+                $scope.tennis.score.firstFault = true;
+                $scope.tennis.score['singleFault' + $scope.tennis.score.server] ++;
             }
         };
 
@@ -1314,31 +1568,31 @@ app.controller('tennisCGController', ['$scope', 'socket',
             // given the scoring player, get their opponent
             var opponent = (player == 1 ? 2 : 1);
 
-            if ($scope.tennisScore.tiebreak == false) {
-                if (player == $scope.tennisScore.server) {
-					          // player was serving, and not in a tiebreak, count this as service game win
-					          $scope.tennisScore['servicesWon' + player] ++;
-				        } else {
-					          // opponent was serving, and not in a tiebreak, count this as break point win
-					          $scope.tennisScore['breaksWon' + player] ++;
+            if ($scope.tennis.score.tiebreak == false) {
+                if (player == $scope.tennis.score.server) {
+                    // player was serving, and not in a tiebreak, count this as service game win
+                    $scope.tennis.score['servicesWon' + player] ++;
+                } else {
+                    // opponent was serving, and not in a tiebreak, count this as break point win
+                    $scope.tennis.score['breaksWon' + player] ++;
                 }
 
                 // increment service games for server
-                $scope.tennisScore['serviceGame' + $scope.tennisScore.server] ++;
+                $scope.tennis.score['serviceGame' + $scope.tennis.score.server] ++;
             }
 
             // update the sets array
-            $scope.tennisScore['sets' + player].splice(-1,1,($scope.tennisScore['game' + player] + 1));
+            $scope.tennis.score['sets' + player].splice(-1,1,($scope.tennis.score['game' + player] + 1));
 
-            if ($scope.tennisScore.tiebreak == true) {
+            if ($scope.tennis.score.tiebreak == true) {
                 // player won tiebreak game, so wins set
                 winSet(player);
-            } else if ($scope.tennisScore['game' + player] >= 5 && ($scope.tennisScore['game' + player] - $scope.tennisScore['game' + opponent]) >= 1) {
+            } else if ($scope.tennis.score['game' + player] >= 5 && ($scope.tennis.score['game' + player] - $scope.tennis.score['game' + opponent]) >= 1) {
                 // player already won at least 5 games, and now has 2 game advantage, so wins set
                 winSet(player);
             } else {
                 // player can't win set yet, so add a game and reset points
-                $scope.tennisScore['game' + player] ++;
+                $scope.tennis.score['game' + player] ++;
                 resetPoints();
                 $scope.toggleServer();
             }
@@ -1348,44 +1602,44 @@ app.controller('tennisCGController', ['$scope', 'socket',
             // given the scoring player, get their opponent
             var opponent = (player == 1 ? 2 : 1);
 
-            $scope.tennisScore['set' + player] ++;
+            $scope.tennis.score['set' + player] ++;
             resetGames();
 
-            if ($scope.tennisScore['set' + player] > ($scope.tennisOptions.maxSets - 1)/2) {
+            if ($scope.tennis.score['set' + player] > ($scope.tennis.options.maxSets - 1)/2) {
                 // player already won (max - 1) sets, so wins match
-                $scope.tennisOptions.disableInput = true;
+                $scope.tennis.options.disableInput = true;
             } else {
                 // player can't win match yet, so add a set and reset games
-                $scope.tennisScore['sets' + player].push(0);
-                $scope.tennisScore['sets' + opponent].push(0);
+                $scope.tennis.score['sets' + player].push(0);
+                $scope.tennis.score['sets' + opponent].push(0);
 
                 $scope.toggleServer();
             }
         }
 
         function resetPoints() {
-            $scope.tennisScore.point1 = $scope.tennisScore.point2 = $scope.tennisScore.pointName1 = $scope.tennisScore.pointName2 = 0;
+            $scope.tennis.score.point1 = $scope.tennis.score.point2 = $scope.tennis.score.pointName1 = $scope.tennis.score.pointName2 = 0;
         }
 
         function resetGames() {
-            $scope.tennisScore.game1 = $scope.tennisScore.game2 = 0;
+            $scope.tennis.score.game1 = $scope.tennis.score.game2 = 0;
             resetPoints();
         }
 
         $scope.toggleServer = function toggleServer() {
-            $scope.tennisScore.server = ($scope.tennisScore.server == 1 ? 2 : 1);
+            $scope.tennis.score.server = ($scope.tennis.score.server == 1 ? 2 : 1);
         };
 
         function checkTiebreak() {
-            if (($scope.tennisScore.set1 + $scope.tennisScore.set2) == ($scope.tennisOptions.maxSets - 1)) {
+            if (($scope.tennis.score.set1 + $scope.tennis.score.set2) == ($scope.tennis.options.maxSets - 1)) {
                 // this is the last set, so tiebreak is not possible
-                $scope.tennisScore.tiebreak = false;
-            } else if ($scope.tennisScore.game1 == 6 && $scope.tennisScore.game2 == 6 ) {
+                $scope.tennis.score.tiebreak = false;
+            } else if ($scope.tennis.score.game1 == 6 && $scope.tennis.score.game2 == 6 ) {
                 // not the last set, players tied on 6 games each, so tiebreak
-                $scope.tennisScore.tiebreak = true;
+                $scope.tennis.score.tiebreak = true;
             } else {
                 // not a tiebreak
-                $scope.tennisScore.tiebreak = false;
+                $scope.tennis.score.tiebreak = false;
             }
         }
 
@@ -1393,100 +1647,159 @@ app.controller('tennisCGController', ['$scope', 'socket',
             var opponent = (player == 1 ? 2 : 1);
 
             // horrific (but nessesary) if/else function
-            if ($scope.tennisScore.tiebreak == true) {
+            if ($scope.tennis.score.tiebreak == true) {
 
-                if ($scope.tennisScore['point' + player] >= 6 && ($scope.tennisScore['point' + player] - $scope.tennisScore['point' + opponent]) >= 1) {
+                if ($scope.tennis.score['point' + player] >= 6 && ($scope.tennis.score['point' + player] - $scope.tennis.score['point' + opponent]) >= 1) {
                     // tiebreak, so scoring player needs to have at least 6 points, with a 1 point advantage
 
-                    if ($scope.tennisScore['set' + player] == ($scope.tennisOptions.maxSets - 1)/2) {
-                        $scope.tennisScore.gamePoint = "Match Point";
+                    if ($scope.tennis.score['set' + player] == ($scope.tennis.options.maxSets - 1)/2) {
+                        $scope.tennis.score.gamePoint = "Match Point";
                     } else {
-                        $scope.tennisScore.gamePoint = "Set Point";
+                        $scope.tennis.score.gamePoint = "Set Point";
                     }
 
-                } else if ($scope.tennisScore['point' + opponent] >= 6 && ($scope.tennisScore['point' + opponent] - $scope.tennisScore['point' + player]) >= 1) {
+                } else if ($scope.tennis.score['point' + opponent] >= 6 && ($scope.tennis.score['point' + opponent] - $scope.tennis.score['point' + player]) >= 1) {
                     // tiebreak, not scoring player set/match point, so opponent needs to have at least 6 points, with a 1 point advantage
 
-                    if ($scope.tennisScore['set' + opponent] == ($scope.tennisOptions.maxSets - 1)/2) {
-                        $scope.tennisScore.gamePoint = "Match Point";
+                    if ($scope.tennis.score['set' + opponent] == ($scope.tennis.options.maxSets - 1)/2) {
+                        $scope.tennis.score.gamePoint = "Match Point";
                     } else {
-                        $scope.tennisScore.gamePoint = "Set Point";
+                        $scope.tennis.score.gamePoint = "Set Point";
                     }
 
                 } else {
                     // tiebreak, point isn't special, so no message needed
 
-                    $scope.tennisScore.gamePoint = "";
+                    $scope.tennis.score.gamePoint = "";
 
                 }
 
-            } else if ($scope.tennisScore['game' + player] >= 5 && ($scope.tennisScore['game' + player] - $scope.tennisScore['game' + opponent]) >= 1 && $scope.tennisScore['point' + player] >= 3 && ($scope.tennisScore['point' + player] - $scope.tennisScore['point' + opponent]) >= 1) {
+            } else if ($scope.tennis.score['game' + player] >= 5 && ($scope.tennis.score['game' + player] - $scope.tennis.score['game' + opponent]) >= 1 && $scope.tennis.score['point' + player] >= 3 && ($scope.tennis.score['point' + player] - $scope.tennis.score['point' + opponent]) >= 1) {
                 // normal game, so scoring player needs to have at least 5 games, with a 1 game advantage; and at least 40, with a 1 point advantage
 
-                if ($scope.tennisScore['set' + player] == ($scope.tennisOptions.maxSets - 1)/2) {
-                    $scope.tennisScore.gamePoint = "Match Point";
+                if ($scope.tennis.score['set' + player] == ($scope.tennis.options.maxSets - 1)/2) {
+                    $scope.tennis.score.gamePoint = "Match Point";
                 } else {
-                    $scope.tennisScore.gamePoint = "Set Point";
+                    $scope.tennis.score.gamePoint = "Set Point";
                 }
 
                 // check if this is also break point and increment
-                if ($scope.tennisScore.server != player) {
-                    $scope.tennisScore['breakPoint' + player] ++;
+                if ($scope.tennis.score.server != player) {
+                    $scope.tennis.score['breakPoint' + player] ++;
                 }
 
-            } else if ($scope.tennisScore['game' + opponent] >= 5 && ($scope.tennisScore['game' + opponent] - $scope.tennisScore['game' + player]) >= 1 && $scope.tennisScore['point' + opponent] >= 3 && ($scope.tennisScore['point' + opponent] - $scope.tennisScore['point' + player]) >= 1) {
+            } else if ($scope.tennis.score['game' + opponent] >= 5 && ($scope.tennis.score['game' + opponent] - $scope.tennis.score['game' + player]) >= 1 && $scope.tennis.score['point' + opponent] >= 3 && ($scope.tennis.score['point' + opponent] - $scope.tennis.score['point' + player]) >= 1) {
                 // normal game, not scoring player set/match point, so opponent needs to have at least 5 games, with a 1 game advantage; and at least 40, with a 1 point advantage
 
-                if ($scope.tennisScore['set' + opponent] == ($scope.tennisOptions.maxSets - 1)/2) {
-                    $scope.tennisScore.gamePoint = "Match Point";
+                if ($scope.tennis.score['set' + opponent] == ($scope.tennis.options.maxSets - 1)/2) {
+                    $scope.tennis.score.gamePoint = "Match Point";
                 } else {
-                    $scope.tennisScore.gamePoint = "Set Point";
+                    $scope.tennis.score.gamePoint = "Set Point";
                 }
 
                 // check if this is also break point and increment
-                if ($scope.tennisScore.server != opponent) {
-                    $scope.tennisScore['breakPoint' + opponent] ++;
+                if ($scope.tennis.score.server != opponent) {
+                    $scope.tennis.score['breakPoint' + opponent] ++;
                 }
 
-            } else if ($scope.tennisScore.server != player && $scope.tennisScore['point' + player] >= 3 && ($scope.tennisScore['point' + player] - $scope.tennisScore['point' + opponent]) >= 1) {
+            } else if ($scope.tennis.score.server != player && $scope.tennis.score['point' + player] >= 3 && ($scope.tennis.score['point' + player] - $scope.tennis.score['point' + opponent]) >= 1) {
                 // normal game, not a set/match point, so player needs be against the serve, have at least 40, with a 1 point advantage
 
-                $scope.tennisScore.gamePoint = "Break Point";
-                $scope.tennisScore['breakPoint' + player] ++;
+                $scope.tennis.score.gamePoint = "Break Point";
+                $scope.tennis.score['breakPoint' + player] ++;
 
-            } else if ($scope.tennisScore.server != opponent && $scope.tennisScore['point' + opponent] >= 3 && ($scope.tennisScore['point' + opponent] - $scope.tennisScore['point' + player]) >= 1) {
+            } else if ($scope.tennis.score.server != opponent && $scope.tennis.score['point' + opponent] >= 3 && ($scope.tennis.score['point' + opponent] - $scope.tennis.score['point' + player]) >= 1) {
                 // normal game, not scoring player set/match point, so opponent needs be against the serve, have at least 40, with a 1 point advantage
 
-                $scope.tennisScore.gamePoint = "Break Point";
-                $scope.tennisScore['breakPoint' + opponent] ++;
+                $scope.tennis.score.gamePoint = "Break Point";
+                $scope.tennis.score['breakPoint' + opponent] ++;
 
             } else {
                 // normal game, point isn't special, so no message needed
 
-                $scope.tennisScore.gamePoint = "";
+                $scope.tennis.score.gamePoint = "";
 
             }
         }
 
         $scope.undoPoint = function() {
-            socket.emit("tennis:undo");
-            $scope.tennisOptions.disableInput = false;
+            if (!$scope.lock) {
+                $scope.lock = true;
+                $http.post(api_root + '/sport/tennis/undo').then($scope.lock = false);
+            }
+            $scope.tennis.options.disableInput = false;
         }
 
-        function getTennisData() {
-            socket.emit("tennis:get");
-        }
 
         $scope.resetAll = function() {
-            socket.emit("tennis:reset");
-            $("input[type='checkbox']").attr("checked", false);
+            if (!$scope.lock) {
+                $scope.lock = true;
+                $http.post(api_root + '/sport/tennis/reset').then($scope.lock = false);
+                getTennisData();
+            }
+
         }
 
     }
 ]);
 
-app.controller('netballCGController', ['$scope', 'localStorageService', 'socket',
-    function($scope, localStorageService, socket){
+app.controller('netballCGController', ['$scope', 'localStorageService', '$http',
+    function($scope, localStorageService, $http){
+
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        getNetballData();
+        /**
+         * Updates the API when $scope.netball changes.
+         */
+        $scope.$watch('netball', function() {
+            // If scope exists and changes are allowed.
+            if ($scope.netball && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/netball', $scope.netball).then($scope.lock = false);
+            }
+        }, true);
+
+        /**
+         * Gets data from API for $scope.netball.
+         */
+        function getNetballData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock){
+                $http.get(api_root + '/sport/netball')
+                .then(function(response){
+                    // Check that request was successful and we didn't recieve an empty body.
+                    if (response.status == 200 && response.data) {
+                        // Check that changes are still not locked, and that the data returned is new.
+                        if (!$scope.lock && $scope.netball != response.data) {
+                            $scope.netball = response.data;
+
+                            netballUpdated();
+                        }
+                    }
+                });
+            }
+        }
+
+        /**
+         * Should be called whenever $scope.netball is modified by the controller.
+         */
+        function netballUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Netball') {
+                    item.live = $scope.netball.show
+                }
+            })
+        }
+
+        // Update data after every data timeout period.
+        setInterval(getNetballData, data_timeout);
+
         var storedHome = localStorageService.get('home_netball');
         var storedAway = localStorageService.get('aways_netball');
 
@@ -1502,29 +1815,105 @@ app.controller('netballCGController', ['$scope', 'localStorageService', 'socket'
             $scope.awayPlayers = storedAway;
         }
 
-        socket.on("clock:tick", function (msg) {
-            $scope.clock = msg.slice(0, msg.indexOf("."));
+        $scope.addHomePlayer = function() {
+            $scope.homePlayers.push($scope.home);
+            $scope.home = {};
+        };
+
+        $scope.addAwayPlayer = function() {
+            $scope.awayPlayers.push($scope.away);
+            $scope.away = {};
+        };
+
+        $scope.delete = function(team, index) {
+            console.log('delete');
+            if(team === 'away') {
+                $scope.awayPlayers.splice(index, 1);
+            } else if (team === 'home') {
+                $scope.homePlayers.splice(index, 1);
+            }
+        };
+
+        $scope.$on("$destroy", function() {
+            localStorageService.set('away_netball', $scope.awayPlayers);
+            localStorageService.set('home_netball', $scope.homePlayers);
         });
 
-        $scope.pauseClock = function() {
-            socket.emit("clock:pause");
-        };
+    }
+]);
 
-        $scope.resetClock = function() {
-            socket.emit("clock:reset");
-        };
+app.controller('waterpoloCGController', ['$scope', 'localStorageService', '$http',
+    function($scope, localStorageService, $http){
 
-        $scope.setClock = function(val) {
-            socket.emit("clock:set", val);
-        };
+        // Lock changes to the scope.
+        $scope.lock = false;
 
-        $scope.downClock = function() {
-            socket.emit("clock:down");
-        };
+        getWaterpoloData();
+        /**
+         * Updates the API when $scope.waterpolo changes.
+         */
+        $scope.$watch('waterpolo', function() {
+            // If waterpolo exists and changes are allowed.
+            if ($scope.waterpolo && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
 
-        $scope.upClock = function() {
-            socket.emit("clock:up");
-        };
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/waterpolo', $scope.waterpolo).then($scope.lock = false);
+            }
+        }, true);
+
+        /**
+         * Gets data from API for $scope.waterpolo.
+         */
+        function getWaterpoloData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock){
+                $http.get(api_root + '/sport/waterpolo')
+                .then(function(response){
+                    // Check that request was successful and we didn't recieve an empty body.
+                    if (response.status == 200 && response.data) {
+                        // Check that changes are still not locked, and that the data returned is new.
+                        if (!$scope.lock && $scope.waterpolo != response.data) {
+                            $scope.waterpolo = response.data;
+
+                            waterpoloUpdated();
+                        }
+                    }
+                });
+            }
+        }
+
+        /**
+         * Should be called whenever $scope.waterpolo is modified by the controller.
+         */
+        function waterpoloUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Waterpolo') {
+                    item.live = $scope.waterpolo.show
+                }
+            })
+        }
+
+        // Update data after every data timeout period.
+        setInterval(getWaterpoloData, data_timeout);
+
+
+        var storedHome = localStorageService.get('home_waterpolo');
+        var storedAway = localStorageService.get('away_waterpolo');
+
+        if(storedHome === null) {
+            $scope.homePlayers = [];
+        } else {
+            $scope.homePlayers = storedHome;
+        }
+
+        if(storedAway === null) {
+            $scope.awayPlayers = [];
+        } else {
+            $scope.awayPlayers = storedAway;
+        }
 
         $scope.addHomePlayer = function() {
             $scope.homePlayers.push($scope.home);
@@ -1545,127 +1934,70 @@ app.controller('netballCGController', ['$scope', 'localStorageService', 'socket'
             }
         };
 
-        socket.on("netball", function (msg) {
-            $scope.netball = msg;
-            $scope.menu.forEach(item => {
-                if (item.name === 'Netball') {
-                    item.live = $scope.netball.show
-                }
-            })
-        });
-
-        $scope.quarterChanged = function() {
-            console.log("Quarter");
-        };
-
-        $scope.$watch('netball', function() {
-            if ($scope.netball) {
-                socket.emit("netball", $scope.netball);
-            } else {
-                getNetballData();
-            }
-        }, true);
-
         $scope.$on("$destroy", function() {
-            localStorageService.set('away_netball', $scope.awayPlayers);
-            localStorageService.set('home_netball', $scope.homePlayers);
+            localStorageService.set('away_waterpolo', $scope.awayPlayers);
+            localStorageService.set('home_waterpolo', $scope.homePlayers);
         });
-
-        function getNetballData() {
-            socket.emit("netball:get");
-            socket.emit("clock:get");
-        }
     }
 ]);
 
-app.controller('waterpoloCGController', ['$scope', 'localStorageService', 'socket',
-  function($scope, localStorageService, socket){
-    var storedHome = localStorageService.get('home_waterpolo');
-    var storedAway = localStorageService.get('away_waterpolo');
-    var clockIcon = 'pause icon'
+app.controller('volleyballCGController', ['$scope', '$http',
+    function ($scope, $http) {
 
-    if(storedHome === null) {
-        $scope.homePlayers = [];
-    } else {
-        $scope.homePlayers = storedHome;
-    }
+        // Lock changes to the scope.
+        $scope.lock = false;
 
-    if(storedAway === null) {
-        $scope.awayPlayers = [];
-    } else {
-        $scope.awayPlayers = storedAway;
-    }
+        getVolleyballData();
+        /**
+         * Updates the API when $scope.volleyball changes.
+         */
+        $scope.$watch('volleyball', function () {
+            // If volleyball exists and changes are allowed.
+            if ($scope.volleyball && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
 
-    socket.on("clock:tick", function (msg) {
-        $scope.clock = msg.slice(0, msg.indexOf("."));
-    });
-
-    $scope.pauseClock = function() {
-        socket.emit("clock:pause");
-    };
-
-    $scope.resetClock = function() {
-        socket.emit("clock:reset");
-    };
-
-    $scope.setClock = function(val) {
-        socket.emit("clock:set", val);
-    };
-
-    $scope.downClock = function() {
-        socket.emit("clock:down");
-    };
-
-    $scope.upClock = function() {
-        socket.emit("clock:up");
-    };
-
-    $scope.addHomePlayer = function() {
-        $scope.homePlayers.push($scope.home);
-        $scope.home = {};
-    };
-
-    $scope.addAwayPlayer = function() {
-        $scope.awayPlayers.push($scope.away);
-        $scope.away = {};
-    };
-
-    $scope.delete = function(team, index) {
-        console.log('delete');
-        if(team === 'away') {
-            $scope.awayPlayers.splice(index, 1);
-        } else if (team === 'home') {
-            $scope.homePlayers.splice(index, 1);
-        }
-    };
-
-    socket.on("waterpolo", function (msg) {
-        $scope.waterpolo = msg;
-        $scope.menu.forEach(item => {
-            if (item.name === 'Waterpolo') {
-                item.live = $scope.waterpolo.show
+                // Send changes and unlock changes.
+                $http.post(api_root + '/sport/volleyball', $scope.volleyball).then($scope.lock = false);
             }
-        })
-    });
+        }, true);
 
-    $scope.$watch('waterpolo', function() {
-        if ($scope.waterpolo) {
-            socket.emit("waterpolo", $scope.waterpolo);
-        } else {
-            getWaterpoloData();
+        /**
+         * Gets data from API for $scope.volleyball.
+         */
+        function getVolleyballData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock) {
+                $http.get(api_root + '/sport/volleyball')
+                    .then(function (response) {
+                        // Check that request was successful and we didn't recieve an empty body.
+                        if (response.status == 200 && response.data) {
+                            // Check that changes are still not locked, and that the data returned is new.
+                            if (!$scope.lock && $scope.volleyball != response.data) {
+                                $scope.volleyball = response.data;
+
+                                volleyballUpdated();
+                            }
+                        }
+                    });
+            }
         }
-    }, true);
 
-    $scope.$on("$destroy", function() {
-        localStorageService.set('away_waterpolo', $scope.awayPlayers);
-        localStorageService.set('home_waterpolo', $scope.homePlayers);
-    });
+        /**
+         * Should be called whenever $scope.volleyball is modified by the controller.
+         */
+        function volleyballUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'Volleyball') {
+                    item.live = $scope.volleyball.showScore
+                }
+            })
+        }
 
-    function getWaterpoloData() {
-        socket.emit("waterpolo:get");
-        socket.emit("clock:get");
+        // Update data after every data timeout period.
+        setInterval(getVolleyballData, data_timeout);
     }
-  }
 ]);
 
 app.controller('volleyballCGController', ['$scope', 'socket',

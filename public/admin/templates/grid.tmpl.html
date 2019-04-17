@@ -7,52 +7,49 @@
 
       <div class="four wide field">
         <label>Grid Position</label>
-        <dropdown title="Grid Position"  ng-model="grid.position">
-          <dropdown-group>bottom left</dropdown-group>
-          <dropdown-group>bottom right</dropdown-group>
-          <dropdown-group>bottom center</dropdown-group>
-          <dropdown-group>top center</dropdown-group>
-          <dropdown-group>top left</dropdown-group>
-          <dropdown-group>top right</dropdown-group>
-        </dropdown>
+        <select ng-model="grid.position" class="ui fluid dropdown">
+            <option value="bottom left">Bottom Left</option>
+            <option value="bottom center">Bottom Center</option>
+            <option value="bottom right">Bottom Right</option>
+            <option value="top left">Top Left</option>
+            <option value="top center">Top Center</option>
+            <option value="top right">Top Right</option>
+        </select>
       </div>
 
       <div class="four wide field">
         <label>Grid Type</label>
-        <dropdown title="Grid Sizes"  ng-model="grid.split">
-          <dropdown-group>halves</dropdown-group>
-          <dropdown-group>sporttimes</dropdown-group>
-          <dropdown-group>onebar</dropdown-group>
-        </dropdown>
+        <select ng-model="grid.split" class="ui fluid dropdown">
+          <option value="halves">Halves</option>
+          <option value="sporttimes">Sports Times</option>
+          <option value="onebar">One Bar</option>
+        </select>
       </div>
 
-      <div class="four wide field">
-        <label>Show Color Options</label>
+      <div class="eight wide field">
+        <label>Color Options</label>
         <div class="ui green button" ng-click="showColorOptions()">Show</div>
-      </div>
-      <div class="four wide field">
-        <label>Hide Color Options</label>
         <div class="ui red button" ng-click="hideColorOptions()">Hide</div>
       </div>
     </div>
   </div>
-  
-  <div id="colorOptions" style="display:block;">
+
+  <div id="colorOptions">
     <div class="content" ng-if="grid.colorShow">
       <div class="ui divider"></div>
 
       <div class="ui grid center aligned">
         <div class="five wide column">
           Heading Color
-          <div class="field"><input id="headingcolorpicker" ng-model="grid.headingcolor" placeholder="Heading Color #"></div>
+          <div class="field"><input type="color" id="headingcolorpicker" ng-model="grid.headingcolor" placeholder="Heading Color #"></div>
         </div>
         <div class="five wide column">
           Left Col Color
-          <div class="field"><input id="leftcolorpicker" ng-model="grid.leftcolor" placeholder="Left Col Color #"></div>
+          <div class="field"><input type="color" id="leftcolorpicker" ng-model="grid.leftcolor" placeholder="Left Col Color #"></div>
         </div>
         <div class="five wide column">
           Right Col Color
-          <div class="field"><input id="rightcolorpicker" ng-model="grid.rightcolor" placeholder="Right Col Color #"></div>
+          <div class="field"><input type="color" id="rightcolorpicker" ng-model="grid.rightcolor" placeholder="Right Col Color #"></div>
         </div>
       </div>
     </div>
@@ -61,7 +58,7 @@
 
     <div class="sixteen wide column">
       <div class="ui divider"></div>
-      
+
       <div class="fields">
         <div class="five wide field">
           <div class="ui form">
@@ -106,33 +103,3 @@
     </div>
   </div>
 </div>
-
-
-<script>
-    $("#headingcolorpicker").spectrum({
-        color: "#cd1d18",
-        preferredFormat: "hex",
-        flat: true,
-    	showInput: true,
-    	allowEmpty:true,
-    	showButtons: false
-    });
-
-    $("#leftcolorpicker").spectrum({
-        color: "#000000",
-        preferredFormat: "hex",
-        flat: true,
-    	showInput: true,
-    	allowEmpty:true,
-    	showButtons: false
-    });
-    
-    $("#rightcolorpicker").spectrum({
-        color: "#cd1d18",
-        preferredFormat: "hex",
-        flat: true,
-    	showInput: true,
-    	allowEmpty:true,
-    	showButtons: false
-    });
-</script>

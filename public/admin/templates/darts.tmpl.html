@@ -3,7 +3,12 @@
 
     <div class="ui grid center aligned">
         <div class="4 wide column">
-            <div class="field"><checkbox ng-model="darts.show" size="large" type="toggle">Show Darts Score</checkbox></div>
+            <div class="field">
+                <div class="ui toggle checkbox">
+                  <input type="checkbox" ng-model="darts.show">
+                  <label>Show Score</label>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -123,7 +128,8 @@
 
                 <div class="three wide field">
                     <div class="ui icon buttons">
-                        <div class="ui blue button" ng-click="take1(last1)">Take</div>
+                        <div class="ui blue button" ng-click="take1(last1)">Take Away</div>
+                        <div class="ui red button" ng-click="set1(last1)">Set To</div>
                         <div class="ui orange button" ng-click="reset1()">Reset</div>
                     </div>
                 </div>
@@ -164,7 +170,8 @@
 
                 <div class="three wide field">
                     <div class="ui icon buttons">
-                        <div class="ui blue button" ng-click="take2(last2)">Take</div>
+                        <div class="ui blue button" ng-click="take2(last2)">Take Away</div>
+                        <div class="ui red button" ng-click="set2(last2)">Set To</div>
                         <div class="ui orange button" ng-click="reset2()">Reset</div>
                     </div>
                 </div>
