@@ -575,3 +575,27 @@ app.controller('clockCtrl', ['$scope', '$http',
         }
     }
 ]);
+
+app.controller('volleyballCtrl', ['$scope', 'socket',
+    function($scope, socket){
+
+        socket.on("volleyball", function (msg) {
+            $scope.volleyball = msg;
+        });
+
+        socket.on("clock:tick", function (msg) {
+            $scope.clock = msg.slice(0, msg.indexOf("."));
+        });
+
+        $scope.$watch('volleyball', function() {
+            if (!$scope.volleyball) {
+                getVolleyballData();
+            }
+        }, true);
+
+        function getVolleyballData() {
+            socket.emit("volleyball:get");
+            socket.emit("clock:get");
+        }
+    }
+]);
