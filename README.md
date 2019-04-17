@@ -16,7 +16,8 @@ For the [graphics](http://127.0.0.1:3000) output, navigate to http://127.0.0.1:3
 Run from the directory this readme is in:
 ```
 npm install
-node server.js
+npm install -g gulp
+gulp
 ```
 
 For the [admin](http://127.0.0.1:3000/admin) page, navigate to http://127.0.0.1:3000/admin
