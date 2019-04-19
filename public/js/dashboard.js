@@ -141,6 +141,14 @@ app.controller('AppCtrl', ['$scope', '$location', '$http',
             live: false,
         });
 
+        $scope.menu.push({
+            name: 'Schedule',
+            url: '/schedule',
+            type: 'link',
+            icon: 'list',
+            live: false,
+        });
+
         getBrandingData();
 
         function getBrandingData() {
@@ -264,6 +272,10 @@ app.config(['$routeProvider', 'localStorageServiceProvider',
             .when("/volleyball", {
                 templateUrl: '/admin/templates/volleyball.tmpl.html',
                 controller: 'volleyballCGController'
+            })
+            .when("/schedule", {
+                templateUrl: '/admin/templates/schedule.tmpl.html',
+                controller: 'scheduleCGController'
             })
             .otherwise({redirectTo: '/general'});
     }
@@ -1993,5 +2005,64 @@ app.controller('volleyballCGController', ['$scope', '$http',
 
         // Update data after every data timeout period.
         setInterval(getVolleyballData, data_timeout);
+    }
+]);
+
+app.controller('scheduleCGController', ['$scope', '$http',
+    function ($scope, $http) {
+
+        // Lock changes to the scope.
+        $scope.lock = false;
+
+        getScheduleData();
+        /**
+         * Updates the API when $scope.schedule changes.
+         */
+        $scope.$watch('schedule', function () {
+            // If schedule exists and changes are allowed.
+            if ($scope.schedule && !$scope.lock) {
+                // Lock changed.
+                $scope.lock = true;
+
+                // Send changes and unlock changes.
+                $http.post(api_root + '/schedule', $scope.schedule).then($scope.lock = false);
+            }
+        }, true);
+
+        /**
+         * Gets data from API for $scope.schedule.
+         */
+        function getScheduleData() {
+            // Only get data if changes are not locked.
+            if (!$scope.lock) {
+                $http.get(api_root + '/schedule')
+                    .then(function (response) {
+                        // Check that request was successful and we didn't recieve an empty body.
+                        if (response.status == 200 && response.data) {
+                            // Check that changes are still not locked, and that the data returned is new.
+                            if (!$scope.lock && $scope.schedule != response.data) {
+                                $scope.schedule = response.data;
+
+                                scheduleUpdated();
+                            }
+                        }
+                    });
+            }
+        }
+
+        /**
+         * Should be called whenever $scope.schedule is modified by the controller.
+         */
+        function scheduleUpdated() {
+            // Find the item in the menu.
+            $scope.menu.forEach(item => {
+                if (item.name === 'schedule') {
+                    item.live = $scope.schedule.showScore
+                }
+            })
+        }
+
+        // Update data after every data timeout period.
+        setInterval(getScheduleData, data_timeout);
     }
 ]);

@@ -1,0 +1,40 @@
+<div ng-controller="scheduleCtrl" class="schedule">
+  <video ng-if="schedule.showBG" src="{{schedule.bgVideoSrc}}" class="bg scale-fade" loop autoplay muted></video>
+
+  <div class="container coverage top center scale-fade" ng-show="schedule.coverage.show">
+    <div class="header">
+      <img src="{{schedule.logoSrc}}" class="broadcaster-logo">
+      <h1 class="title">{{schedule.coverage.title}}</h1>
+    </div>
+    <div class="box">
+      <h2 class="day">Friday</h2>
+      <ul class="events">
+        <li class="event" ng-repeat="event in schedule.coverage.items" >
+          <span class="time">{{event.startTime}}</span>
+          <h3 class="name">{{event.name}}</h3>
+        </li>
+      </ul>
+    </div>
+    <div class="footer scale-fade" ng-if="schedule.showFooter">
+      <span class="supporter">{{schedule.coverage.footerText}}&nbsp;<img src="{{schedule.coverage.footerImage}}"></span>
+    </div>
+  </div>
+  <div class="container events top center scale-fade" ng-show="schedule.events.show">
+    <div class="header">
+      <img src="{{schedule.events.logoSrc}}" class="event-logo">
+      <h1 class="title">{{schedule.events.title}}</h1>
+    </div>
+    <div class="box">
+      <h2 class="day">{{schedule.events.displaying.day}}</h2>
+      <ul class="events" id="events-scroll">
+        <li class="event" ng-repeat="event in schedule.events.displaying.items" >
+          <span class="time">{{event.startTime}}</span><span class="location">{{event.location}}</span>
+          <h3 class="name">{{event.name}}</h3>
+        </li>
+      </ul>
+    </div>
+    <div class="footer scale-fade" ng-if="schedule.showFooter">
+      <span class="supporter">{{schedule.coverage.footerText}}&nbsp;<img src="{{schedule.events.footerImage}}"></span>
+    </div>
+  </div>
+</div>

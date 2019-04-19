@@ -1,0 +1,64 @@
+<div class="ui form segment">
+  <h2>Schedule</h2>
+
+  <div class="ui divider"></div>
+
+  <div class="inline field">
+    <div class="ui toggle checkbox">
+      <input type="checkbox" ng-model="schedule.show">
+      <label>Show Schedule</label>
+    </div>
+  </div>
+
+  <div class="ui divider"></div>
+
+  <div class="inline field">
+    <div class="ui toggle checkbox">
+      <input type="checkbox" ng-model="schedule.showBG">
+      <label>Show Background Video</label>
+    </div>
+  </div>
+
+  <div class="ui divider"></div>
+
+  <div class="sixteen wide column">
+    <div class="inline fields">
+      <div class="five wide field">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" ng-model="schedule.showFooter">
+          <label>Show Footer</label>
+        </div>
+      </div>
+    </div>
+    <div class="sixteen wide column">
+      <div class="inline fields">
+        <div class="eight wide field">
+          <select title="Current Quarter" ng-model="schedule.footerText" class="ui fluid dropdown">
+              <option>In collaboration with</option>
+              <option>Supported by</option>
+              <option value=""></option>
+          </select>
+          <input name="customfooter" placeholder="Custom Text" type="text" ng-model="schedule.events.footerText" />
+        </div>
+        <div class="five wide field">
+          <div class="ui toggle checkbox">
+            <input type="checkbox" ng-model="schedule.su[p">
+            <label>Show Live</label>
+          </div>
+        </div>
+      </div>
+      <div class="sixteen wide column">
+        <div class="inline fields">
+          <div class="five wide field">
+            <input name="coveragetitle" placeholder="Coverage Schedule Title" type="text" ng-model="schedule.coverage.title" />
+          </div>
+          <div class="five wide">
+            <div class="ui toggle checkbox">
+              <input type="checkbox" ng-model="bug.showLocation">
+              <label>Show Location</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

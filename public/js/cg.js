@@ -389,6 +389,61 @@ app.controller('volleyballCtrl', ['$scope', '$http',
     }
 ]);
 
+
+
+app.controller('scheduleCtrl', ['$scope', '$http',
+    function ($scope, $http) {
+
+        function getSchedule() {
+            console.log("getting schedule")
+            $http.get(api_root + '/schedule')
+                .then(function (response) {
+                    if (response.status == 200 && response.data) {
+                        if (response.data != {}) {
+                            $scope.schedule = response.data;
+                            setTimeout(scrollEvents, 2000);
+                        }
+                    } else {
+                        setTimeout(getSchedule, 2000);
+                    }
+
+                });
+        }
+
+        function animationComplete() {
+            $http.post(api_root + '/schedule/finished')
+                .then(function (response) {
+                    if (response.status == 200 && response.data) {
+                        angular.element('#events-scroll').animate({ scrollTop: 0 }, {duration: "medium", complete: function() {
+                            scrolling = false;
+                            getSchedule();
+                        }})
+                    }
+                }
+                )
+
+        }
+
+        getSchedule();
+
+        var scrolling = false;
+        function scrollEvents() {
+            if (!scrolling) {
+                console.log("Scrolling")
+                console.log(angular.element('#events-scroll').prop("scrollHeight"))
+                let scrollby = angular.element('#events-scroll').prop("scrollHeight") - angular.element('#events-scroll').height();
+                angular.element('#events-scroll')
+                    .animate({ scrollTop: scrollby }, { duration: scrollby*14, complete: function () { setTimeout(animationComplete, 2000) } } )
+                    ;
+            }
+            scrolling = true;
+        }
+
+    }
+]);
+
+
+
 /* Very WIP, please refactor this! */
 app.controller('clockCtrl', ['$scope', '$http',
     function ($scope, $http) {

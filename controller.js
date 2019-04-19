@@ -65,6 +65,66 @@ var state_default = {
             show: false
         }
     },
+    schedule: {
+        show: true,
+        showBG: true,
+        bgVideoSrc: "/images/roses-bg-blank.mp4",
+        bgAutoPlay: true,
+        footerText: "In collaboration with ",
+        footerImage: "/images/la1tv-logo.svg",
+        coverage: {
+            title: "Official Broadcast Schedule",
+            logoSrc: "/images/roses-schedule-logo.png",
+            showFooter: true,
+            items: [
+                {
+                    name: "Hockey - Women's 1st",
+                    startTime: "10:15",
+                    endTime: "10:45"
+                },
+                {
+                    name: "Something else",
+                    startTime: "10:15",
+                    endTime: "10:45"
+                },
+                {
+                    name: "An Extra Thing",
+                    startTime: "10:15",
+                    endTime: "10:45"
+                },
+                {
+                    name: "More Sport",
+                    startTime: "10:15",
+                    endTime: "10:45"
+                },
+                {
+                    name: "Too Much Sport",
+                    startTime: "10:15",
+                    endTime: "10:45"
+                },
+                {
+                    name: "Watch the Roses",
+                    startTime: "10:15",
+                    endTime: "10:45"
+                },
+                {
+                    name: "It's gonna move!",
+                    startTime: "10:15",
+                    endTime: "10:45"
+                },
+            ]
+        },
+        events: {
+            title: "Events Schedule",
+            logoSrc: "/images/roses-2019.png",
+            showFooter: true,
+            show: true,
+            displaying: {
+                day: "Friday"
+            },
+            items: []
+        }
+    },
     boxing: {
         homeTeam: homeTeamShortName,
         awayTeam: awayTeamShortName,
@@ -338,6 +398,119 @@ exports.set_roses = function(req, res) {
 
     res.status(200).send("Updated");
 }
+
+var currentDate = new Date();
+var startDate = new Date("2019/05/03")
+var endDate = new Date("2019/05/05")
+
+exports.schedule_get_event_data = function () {
+    const request = require('request');
+    request("http://localhost:1337/api/v1/roses/timetable_entries", { json: true }, (err, res, body) => {
+        if (err) { return console.log(err); }
+        var events = [];
+        var displayingEvents = [];
+        let days = ["Sunday", "Monday", "Tues", "Wed", "Thurs", "Friday", "Saturday"]
+        state.schedule.events.displaying.day = days[currentDate.getDay()]
+        for (api_event in body) {
+            var event = {};
+            api_event = body[api_event]
+            //if (api_event.la1tv_coverage_level != null) {
+            eventDate = new Date(api_event.start)
+            event.startRaw = api_event.start;
+            event.startTime = eventDate.toLocaleTimeString('en-GB', { hour: "numeric", minute: "numeric" });
+            //event.endTime = api_event.eve
+            event.name = api_event.team.sport.title + " - " + api_event.team.title
+            event.location = api_event.location.name
+            events.push(event)
+
+            if (currentDate.getDate() === eventDate.getDate()) {
+                displayingEvents.push(event)
+            }
+
+        }
+
+        state.schedule.events.items = events;
+        state.schedule.events.displaying.items = displayingEvents;
+        state.schedule.coverage.items = events;
+
+        schedule_fsm(states.GOT_EVENT_DATA);
+    });
+
+}
+
+const states = {
+    NO_EVENT_DATA: 0,
+    GET_EVENT_DATA: 1,
+    GOT_EVENT_DATA: 2,
+    GET_NEXT_CONTENT: 3
+
+}
+
+var current_state = states.NO_EVENT_DATA;
+
+
+var schedule_fsm = function (new_state = current_state) {
+    if (current_state != new_state) {
+        current_state = new_state;
+    }
+    console.log("Swiching to state: " + new_state)
+    switch(new_state) {
+        case states.NO_EVENT_DATA:
+            currentDate.setTime(startDate.getTime());
+            new_state = states.GET_EVENT_DATA
+            break
+        case states.GET_EVENT_DATA:
+            exports.schedule_get_event_data()
+            break
+        case states.GOT_EVENT_DATA:
+            //help
+            break
+        case states.GET_NEXT_CONTENT:
+            currentDate.setDate(currentDate.getDate() + 1)
+            if (currentDate.getTime() > endDate.getTime()) {
+                currentDate.setTime(startDate.getTime());
+            }
+            new_state = states.GET_EVENT_DATA
+            break
+    }
+    if (current_state != new_state) {
+        schedule_fsm(new_state)
+    }
+
+
+
+}
+
+schedule_fsm(current_state)
+/**
+ * Gets the state of the schedule.
+ */
+exports.get_schedule = function (req, res) {
+    //return res.json([]);
+    if (current_state == states.GOT_EVENT_DATA) {
+        return res.json(state.schedule);
+    } else {
+        return res.json();
+    }
+}
+
+/**
+ * Sets the state of the Roses scores.
+ */
+exports.set_schedule = function (req, res) {
+    state.schedule = req.body;
+
+    res.status(200).send("Updated");
+}
+
+/**
+ * Sets the state of the Schedule.
+ */
+exports.set_schedule_finished = function (req, res) {
+    schedule_fsm(states.GET_NEXT_CONTENT)
+    res.status(200).send("Updated");
+}
+
 
 /**
  * Gets the current state.

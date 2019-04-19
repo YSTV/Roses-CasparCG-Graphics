@@ -28,6 +28,9 @@ module.exports = function(app) {
     app.route('/roses/lanc');
     app.route('/roses/york');
 
+    app.route('/schedule').get(controller.get_schedule).post(controller.set_schedule);
+    app.route('/schedule/finished').post(controller.set_schedule_finished);
+
     app.route('/sport/tennis/undo').post(controller.undo_tennis);
     app.route('/sport/tennis/reset').post(controller.reset_tennis);
     app.route('/sport/:sport').get(controller.get_sport).post(controller.set_sport);
