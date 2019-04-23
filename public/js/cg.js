@@ -2,6 +2,10 @@ var app = angular.module('cgApp', ['ngAnimate']);
 var data_timeout = 1000;
 var api_root = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
 
+// Now JS has loaded and is running, remove the display:none that prevents the mess on page load.
+var element = document.getElementById('body');
+element.style = null;
+
 app.controller('lowerThirdsCtrl', ['$scope', '$http',
     function($scope, $http){
         function getLowerThirds() {
