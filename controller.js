@@ -11,6 +11,9 @@ const awayTeamImage = "images/YorkSport250.png";
 // The logo for the event.
 const eventLogo = "/images/roses2019logo.png";
 const eventName = "Roses 2019";
+const broadcasterLogo = "/images/YSTV_Roses.png"; // Set to null if not used.
+const brandPrimaryCol = "#d40c42";
+const brandSecondaryCol = "#333333";
 
 // The default server state.
 // Holds the initial settings for resetting the server state without restarting server.
@@ -21,15 +24,16 @@ var state_default = {
         showLive: false,
         showLocation: false,
         logo: eventLogo,
+        broadcasterLogo: broadcasterLogo,
         showLogo: false,
         showGeneral: false,
         showClock: false
     },
     grid: {
         colorShow: false,
-        headingcolor:"#BC204B",
-        leftcolor: "#1f1a34",
-        rightcolor:"#1f1a34",
+        headingcolor: brandPrimaryCol,
+        leftcolor: brandSecondaryCol,
+        rightcolor: brandSecondaryCol,
         header: "",
         rows: [], // { left: "", right: "" }
         position: null,
@@ -47,6 +51,7 @@ var state_default = {
         showProgress: false,
         totalPoints: 354,
         eventName: eventName,
+        eventLogo: eventLogo,
     },
     lowerThirds: {
         left: {

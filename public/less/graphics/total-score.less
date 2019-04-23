@@ -5,18 +5,19 @@
 /**************************************************/
 
 .total-score, .football-score {
-    width: 35%;
+    min-width: 20vw;
+    max-width: 35vw;
     text-align: center;
     border-radius: 8px;
     background-clip: padding-box;
 }
 
 .total-score h1 {
-    color: @brand-text-colour-h2-alt;
+    color: @brand-text-colour-h1;
     font-size: 20px;
-    padding: 6px;
+    padding: 13px;
     text-transform: uppercase;
-    background-color: @brand-background-colour-tertiary !important;
+    background-color: @brand-background-colour-secondary !important;
 }
 
 .total-score .lanc {
@@ -24,7 +25,7 @@
     width: 50%;
     font-size: 20px;
     font-weight: 600;
-    line-height: 50px;
+    line-height: 6vh;
     color: @brand-text-colour-h1;
     padding: 6px;
     background-color: @team-1-colour;
@@ -35,17 +36,21 @@
     width: 50%;
     font-size: 20px;
     font-weight: 600;
-    line-height: 50px;
+    line-height: 6vh;
     color: @brand-text-colour-h1-alt;
     padding: 6px;
     background-color: @team-2-colour !important;
 }
 
+.total-score .event-logo {
+    margin-top: -10vh;
+    max-height: 10vh;
+}
 
 .leftLogo, .rightLogo {
     height: 175px;
     width: 175px;
-    z-index: 100;
+    z-index: 1;
     bottom: 30px;
 }
 
