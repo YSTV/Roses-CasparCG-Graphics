@@ -9,7 +9,7 @@ const homeTeamImage = "images/LancasterSport250.png";
 const awayTeamImage = "images/YorkSport250.png";
 
 // The logo for the event.
-const eventLogo = "/images/roses2018logo.png";
+const eventLogo = "/images/roses2019logo.png";
 const eventName = "Roses 2019";
 
 // The default server state.
