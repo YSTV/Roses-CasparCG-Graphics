@@ -4,19 +4,29 @@
 /*              [Boxing]                         */
 /**************************************************/
 .boxing {
-    background-color: @brand-background-colour-primary;
     width: 15%;
 }
 
 .boxing .score-inner {
     color: @brand-text-colour-h1;
     text-align: center;
-    padding: 15px 30px 15px 30px;
-    background-color: @brand-background-colour-primary;
+    background-color: @brand-background-colour-secondary;
 }
 
-.boxing .boxing-score .score-inner .float-left {
+.boxing .score-inner .float-left {
     padding-bottom: 12px;
+}
+
+.boxing .score-inner .home {
+    width: 50%;
+    padding: 15px 0;
+    background-color: @team-1-colour;
+}
+
+.boxing .score-inner .away {
+    width: 50%;
+    padding: 15px 0;
+    background-color: @team-2-colour;
 }
 
 .boxing .timer {
