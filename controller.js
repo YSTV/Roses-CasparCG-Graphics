@@ -66,63 +66,32 @@ var state_default = {
         }
     },
     schedule: {
-        show: true,
         showBG: true,
         bgVideoSrc: "/images/roses-bg-blank.mp4",
         bgAutoPlay: true,
-        footerText: "In collaboration with ",
-        footerImage: "/images/la1tv-logo.svg",
         coverage: {
+            show: false,
             title: "Official Broadcast Schedule",
             logoSrc: "/images/roses-schedule-logo.png",
             showFooter: true,
-            items: [
-                {
-                    name: "Hockey - Women's 1st",
-                    startTime: "10:15",
-                    endTime: "10:45"
-                },
-                {
-                    name: "Something else",
-                    startTime: "10:15",
-                    endTime: "10:45"
-                },
-                {
-                    name: "An Extra Thing",
-                    startTime: "10:15",
-                    endTime: "10:45"
-                },
-                {
-                    name: "More Sport",
-                    startTime: "10:15",
-                    endTime: "10:45"
-                },
-                {
-                    name: "Too Much Sport",
-                    startTime: "10:15",
-                    endTime: "10:45"
-                },
-                {
-                    name: "Watch the Roses",
-                    startTime: "10:15",
-                    endTime: "10:45"
-                },
-                {
-                    name: "It's gonna move!",
-                    startTime: "10:15",
-                    endTime: "10:45"
-                },
-            ]
+            footerText: "In collaboration with ",
+            footerImage: "/images/la1tv-logo.svg",
+            items: [],
+            displaying: {
+                day: "Friday"
+            },
         },
         events: {
             title: "Events Schedule",
             logoSrc: "/images/roses-2019.png",
             showFooter: true,
-            show: true,
+            show: false,
             displaying: {
                 day: "Friday"
             },
-            items: []
+            items: [],
+            footerText: "Scores, news and live coverage at",
+            footerImage: "/images/roseslive-logo.png",
         }
     },
     boxing: {
@@ -399,6 +368,21 @@ exports.set_roses = function(req, res) {
     res.status(200).send("Updated");
 }
 
+const states = {
+    NO_EVENT_DATA: 0,
+    GET_EVENT_DATA: 1,
+    GOT_EVENT_DATA: 2,
+    GET_NEXT_CONTENT: 3,
+    GET_NEXT_GRAPHIC: 4
+}
+
+const graphic_types = {
+    NONE: 0,
+    EVENT_SCHEDULE: 1,
+    COVERAGE_SCHEDULE: 2,
+    COMING_UP: 3
+}
+
 var currentDate = new Date();
 var startDate = new Date("2019/05/03")
 var endDate = new Date("2019/05/05")
@@ -421,6 +405,9 @@ exports.schedule_get_event_data = function () {
             //event.endTime = api_event.eve
             event.name = api_event.team.sport.title + " - " + api_event.team.title
             event.location = api_event.location.name
+            event.coverage_tv = true;
+            event.coverage_radio = true;
+            event.coverage_print = true;
             events.push(event)
 
             if (currentDate.getDate() === eventDate.getDate()) {
@@ -431,57 +418,170 @@ exports.schedule_get_event_data = function () {
 
         state.schedule.events.items = events;
         state.schedule.events.displaying.items = displayingEvents;
-        state.schedule.coverage.items = events;
 
-        schedule_fsm(states.GOT_EVENT_DATA);
+        console.log("About to run schedule_fsm from schedule_get_event_data.")
+        schedule_fsm(null, states.GOT_EVENT_DATA);
     });
 
 }
 
-const states = {
-    NO_EVENT_DATA: 0,
-    GET_EVENT_DATA: 1,
-    GOT_EVENT_DATA: 2,
-    GET_NEXT_CONTENT: 3
+exports.schedule_get_coverage_data = function () {
+    const request = require('request');
+    request("http://localhost:4200/api/v1/events", { json: true }, (err, res, body) => {
+        if (err) { return console.log(err); }
+        var events = [];
+        var displayingEvents = [];
+        let days = ["Sunday", "Monday", "Tues", "Wed", "Thurs", "Friday", "Saturday"]
+        state.schedule.coverage.displaying.day = days[currentDate.getDay()]
+        for (api_event in body.events) {
+            var event = {};
+            api_event = body.events[api_event]
+            //if (api_event.la1tv_coverage_level != null) {
+            eventDate = new Date(api_event.startTime)
+            event.startRaw = api_event.startTime;
+            event.startTime = eventDate.toLocaleTimeString('en-GB', { hour: "numeric", minute: "numeric" });
+            //event.endTime = api_event.eve
+            event.name = api_event.name
+            //event.location = api_event.location.name
+            //event.coverage_tv = true;
+            //event.coverage_radio = true;
+            //event.coverage_print = true;
+            events.push(event)
+
+            if (currentDate.getDate() === eventDate.getDate()) {
+                displayingEvents.push(event)
+            }
+
+        }
+
+        state.schedule.coverage.displaying.items = displayingEvents;
+        state.schedule.coverage.items = events;
+
+        console.log("About to run schedule_fsm from schedule_get_coverage_data.")
+        schedule_fsm( null, states.GOT_EVENT_DATA);
+    });
 
 }
+
+
 
 var current_state = states.NO_EVENT_DATA;
 
+var current_graphic = graphic_types.NONE
 
-var schedule_fsm = function (new_state = current_state) {
+
+var schedule_fsm = function (new_graphic, new_state) {
+    if (new_graphic == null) {
+        new_graphic = current_graphic
+    }
+    if (new_state == null) {
+        new_state = current_state
+    }
     if (current_state != new_state) {
         current_state = new_state;
     }
-    console.log("Swiching to state: " + new_state)
-    switch(new_state) {
-        case states.NO_EVENT_DATA:
-            currentDate.setTime(startDate.getTime());
-            new_state = states.GET_EVENT_DATA
-            break
-        case states.GET_EVENT_DATA:
-            exports.schedule_get_event_data()
-            break
-        case states.GOT_EVENT_DATA:
-            //help
-            break
-        case states.GET_NEXT_CONTENT:
-            currentDate.setDate(currentDate.getDate() + 1)
-            if (currentDate.getTime() > endDate.getTime()) {
-                currentDate.setTime(startDate.getTime());
+    if (current_graphic != new_graphic) {
+        current_graphic = new_graphic;
+    }
+    console.log("Swiching to graphic: " + current_graphic + " - State: " + new_state)
+    switch(current_graphic) {
+        case graphic_types.NONE:
+            //TODO: make this smart
+            switch(new_state) {
+                case states.GET_NEXT_GRAPHIC:
+                    new_graphic = graphic_types.COVERAGE_SCHEDULE
+                    new_state = states.NO_EVENT_DATA
+                    break
+                default:
+                    new_state = states.GET_NEXT_GRAPHIC
+                    break
             }
-            new_state = states.GET_EVENT_DATA
+            break
+
+        case graphic_types.EVENT_SCHEDULE:
+            switch(new_state) {
+                case states.NO_EVENT_DATA:
+                    currentDate.setTime(startDate.getTime());
+                    new_state = states.GET_EVENT_DATA
+                    break
+                case states.GET_EVENT_DATA:
+                    exports.schedule_get_event_data()
+                    break
+                case states.GOT_EVENT_DATA:
+                    //help
+                    state.schedule.events.show = true;
+                    state.schedule.coverage.show = false;
+                    break
+                case states.GET_NEXT_CONTENT:
+                    currentDate.setDate(currentDate.getDate() + 1)
+                    if (currentDate.getTime() > endDate.getTime()) {
+
+                        currentDate.setTime(startDate.getTime());
+                        new_state = states.GET_NEXT_GRAPHIC
+
+                    } else {
+                        new_state = states.GET_EVENT_DATA
+                    }
+                    break
+                case states.GET_NEXT_GRAPHIC:
+
+                    new_graphic = graphic_types.COVERAGE_SCHEDULE
+                    new_state = states.NO_EVENT_DATA
+                    break
+                default:
+                    //something broke, let's go to the next graphic.
+                    new_state = states.GET_NEXT_GRAPHIC
+                    break
+            }
+            break
+
+        case graphic_types.COVERAGE_SCHEDULE:
+            switch(new_state) {
+                case states.NO_EVENT_DATA:
+                    currentDate.setTime(startDate.getTime());
+                    new_state = states.GET_EVENT_DATA
+                    break
+                case states.GET_EVENT_DATA:
+                    exports.schedule_get_coverage_data()
+                    break
+                case states.GOT_EVENT_DATA:
+                    //Start the displaying bit
+                    state.schedule.events.show = false;
+                    state.schedule.coverage.show = true;
+                    break
+                case states.GET_NEXT_CONTENT:
+                    currentDate.setDate(currentDate.getDate() + 1)
+                    if (currentDate.getTime() > endDate.getTime()) {
+
+                        currentDate.setTime(startDate.getTime());
+                        new_state = states.GET_NEXT_GRAPHIC
+
+                    } else {
+                        new_state = states.GET_EVENT_DATA
+                    }
+                    break
+                case states.GET_NEXT_GRAPHIC:
+                    new_graphic = graphic_types.EVENT_SCHEDULE
+                    new_state = states.NO_EVENT_DATA
+                    break
+                default:
+                    //something broke, let's go to the next graphic.
+                    new_state = states.GET_NEXT_GRAPHIC
+                    break
+            }
             break
     }
-    if (current_state != new_state) {
-        schedule_fsm(new_state)
+    console.log(" " + current_graphic + new_graphic +  current_state +  new_state)
+    if ((current_state != new_state) || (current_graphic != new_graphic)) {
+        console.log("state change detected.")
+        schedule_fsm(new_graphic, new_state)
     }
 
 
 
 }
-
-schedule_fsm(current_state)
+console.log("About to run schedule_fsm from main.")
+schedule_fsm(null, null)
 /**
  * Gets the state of the schedule.
  */
@@ -507,7 +607,8 @@ exports.set_schedule = function (req, res) {
  * Sets the state of the Schedule.
  */
 exports.set_schedule_finished = function (req, res) {
-    schedule_fsm(states.GET_NEXT_CONTENT)
+    console.log("About to run schedule_fsm from set_schedule_finished.")
+    schedule_fsm(null, states.GET_NEXT_CONTENT)
     res.status(200).send("Updated");
 }
 

@@ -3,19 +3,19 @@
 
   <div class="container coverage top center scale-fade" ng-show="schedule.coverage.show">
     <div class="header">
-      <img src="{{schedule.logoSrc}}" class="broadcaster-logo">
+      <img src="{{schedule.coverage.logoSrc}}" class="broadcaster-logo">
       <h1 class="title">{{schedule.coverage.title}}</h1>
     </div>
     <div class="box">
-      <h2 class="day">Friday</h2>
-      <ul class="events">
-        <li class="event" ng-repeat="event in schedule.coverage.items" >
+      <h2 class="day">{{schedule.coverage.displaying.day}}</h2>
+      <ul class="events" id="coverage-scroll">
+        <li class="event" ng-repeat="event in schedule.coverage.displaying.items" >
           <span class="time">{{event.startTime}}</span>
           <h3 class="name">{{event.name}}</h3>
         </li>
       </ul>
     </div>
-    <div class="footer scale-fade" ng-if="schedule.showFooter">
+    <div class="footer scale-fade" ng-if="schedule.coverage.showFooter">
       <span class="supporter">{{schedule.coverage.footerText}}&nbsp;<img src="{{schedule.coverage.footerImage}}"></span>
     </div>
   </div>
@@ -30,11 +30,14 @@
         <li class="event" ng-repeat="event in schedule.events.displaying.items" >
           <span class="time">{{event.startTime}}</span><span class="location">{{event.location}}</span>
           <h3 class="name">{{event.name}}</h3>
+          <span class="coverage-tv"><i class="fa fa-tv"></i> Live TV</span>
+          <span class="coverage-radio"><i class="fa fa-volume-up"></i> Radio Commentary</span>
+          <span class="coverage-print"><i class="fa fa-newspaper"></i> Written Coverage</span>
         </li>
       </ul>
     </div>
-    <div class="footer scale-fade" ng-if="schedule.showFooter">
-      <span class="supporter">{{schedule.coverage.footerText}}&nbsp;<img src="{{schedule.events.footerImage}}"></span>
+    <div class="footer scale-fade" ng-if="schedule.events.showFooter">
+      <span class="supporter">{{schedule.events.footerText}}&nbsp;<img src="{{schedule.events.footerImage}}"></span>
     </div>
   </div>
 </div>

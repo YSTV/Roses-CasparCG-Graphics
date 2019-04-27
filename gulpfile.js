@@ -17,7 +17,7 @@ gulp.task('less', function(){
 
 gulp.task('watchFiles', function(){
 	return watch('./public/less/**/*.less', function(){
-		gulp.start('less');
+		//gulp.start('less');
 	});
 });
 
@@ -44,10 +44,9 @@ gulp.task('runserver', function() {
 	//Serve the puplic dir
 	app.use(express.static(__dirname + "/public"));
 
-	app.listen(3000)
-	console.log("Now listening on port 3000 Go to http://127.0.0.1:3000/admin to control");
-	console.log("run 'play 1-1 [html] http://127.0.0.1:3000 in CasparCG to start the graphics");
-
+	app.listen(3001)
+	console.log("Now listening on port 3000 Go to http://127.0.0.1:3001/admin to control");
+	console.log("run 'play 1-1 [html] http://127.0.0.1:3001 in CasparCG to start the graphics");
 });
 
 exports.default = gulp.series(gulp.parallel('less', 'fileinclude'), gulp.parallel('watchFiles', 'runserver'))
