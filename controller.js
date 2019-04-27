@@ -523,14 +523,13 @@ var schedule_fsm = function (new_graphic, new_state) {
                     }
                     break
                 case states.GET_NEXT_GRAPHIC:
-
                     new_graphic = graphic_types.COVERAGE_SCHEDULE
                     new_state = states.NO_EVENT_DATA
+                    state.schedule.events.show = false;
                     break
                 default:
                     //something broke, let's go to the next graphic.
                     new_state = states.GET_NEXT_GRAPHIC
-                    state.schedule.events.show = false;
                     break
             }
             break
