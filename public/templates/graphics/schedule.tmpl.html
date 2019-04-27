@@ -1,6 +1,8 @@
 <div ng-controller="scheduleCtrl" class="schedule">
   <video ng-if="schedule.showBG" src="{{schedule.bgVideoSrc}}" class="bg scale-fade" loop autoplay muted></video>
-
+  <audio ng-if="schedule.bgAudioSrc" controls autoplay loop class="hidden">
+    <source src="{{schedule.bgAudioSrc}}">
+  </audio>
   <div class="container coverage top center scale-fade" ng-show="schedule.coverage.show">
     <div class="header">
       <img src="{{schedule.coverage.logoSrc}}" class="broadcaster-logo">
@@ -10,7 +12,7 @@
       <h2 class="day">{{schedule.coverage.displaying.day}}</h2>
       <ul class="events" id="coverage-scroll">
         <li class="event" ng-repeat="event in schedule.coverage.displaying.items" >
-          <span class="time">{{event.startTime}}</span>
+          <span class="time">{{event.startTime}}</span><span class="location">{{event.location}}</span>
           <h3 class="name">{{event.name}}</h3>
         </li>
       </ul>
@@ -38,6 +40,47 @@
     </div>
     <div class="footer scale-fade" ng-if="schedule.events.showFooter">
       <span class="supporter">{{schedule.events.footerText}}&nbsp;<img src="{{schedule.events.footerImage}}"></span>
+    </div>
+  </div>
+  <div class="container comingup top center scale-fade" ng-show="schedule.comingup.show">
+    <div class="header">
+      <h1 class="title">{{schedule.comingup.title}}</h1>
+    </div>
+    <div class="content">
+      <div class="now event">
+        <h2 class="now-next-header">{{schedule.comingup.nowText}}</h2>
+        <br>
+        <span class="time">{{schedule.comingup.displaying.items.now.startTime}}</span>
+        <span class="location">{{schedule.comingup.displaying.items.now.location}}</span>
+        <h3 class="name">{{schedule.comingup.displaying.items.now.name}}</h3>
+      </div>
+      <div ng-if="schedule.comingup.showNext" class="next event">
+        <h2 class="now-next-header">Then</h2>
+        <br>
+        <span class="time">{{schedule.comingup.displaying.items.next.startTime}}</span>
+        <span class="location">{{schedule.comingup.displaying.items.next.location}}</span>
+        <h3 class="name">{{schedule.comingup.displaying.items.next.name}}</h3>
+      </div>
+    </div>
+    <audio ng-if="schedule.comingup.displaying.items.now.audioFile" controls autoplay class="hidden">
+      <source src="{{schedule.comingup.displaying.items.now.audioFile}}">
+    </audio>
+    <img src="{{schedule.comingup.logoSrc}}" class="comingup-logo">
+
+    <!--<div class="box">
+      <h2 class="day">{{schedule.comingup.displaying.day}}</h2>
+      <ul class="events" id="events-scroll">
+        <li class="event" ng-repeat="event in schedule.events.displaying.items" >
+          <span class="time">{{event.startTime}}</span><span class="location">{{event.location}}</span>
+          <h3 class="name">{{event.name}}</h3>
+          <span class="coverage-tv"><i class="fa fa-tv"></i> Live TV</span>
+          <span class="coverage-radio"><i class="fa fa-volume-up"></i> Radio Commentary</span>
+          <span class="coverage-print"><i class="fa fa-newspaper"></i> Written Coverage</span>
+        </li>
+      </ul>
+    </div>  -->
+    <div class="footer scale-fade" ng-if="schedule.comingup.showFooter">
+      <span class="supporter">{{schedule.comingup.footerText}}&nbsp;<img src="{{schedule.comingup.footerImage}}"></span>
     </div>
   </div>
 </div>

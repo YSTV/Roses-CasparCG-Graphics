@@ -69,6 +69,7 @@ var state_default = {
         showBG: true,
         bgVideoSrc: "/images/roses-bg-blank.mp4",
         bgAutoPlay: true,
+        bgAudioSrc: "/bg-music.mp3",
         coverage: {
             show: false,
             title: "Official Broadcast Schedule",
@@ -92,6 +93,18 @@ var state_default = {
             items: [],
             footerText: "Scores, news and live coverage at",
             footerImage: "/images/roseslive-logo.png",
+        },
+        comingup: {
+            show: false,
+            title: "Coming up...",
+            nowText: "Starting shortly...",
+            showNext: true,
+            showFooter: true,
+            logoSrc: "/images/comingup-logo.png",
+            footerText: "See all the live video coverage at",
+            footerImage: "/images/roseslive-logo.png",
+            displaying: {
+            },
         }
     },
     boxing: {
@@ -442,7 +455,7 @@ exports.schedule_get_coverage_data = function () {
             event.startTime = eventDate.toLocaleTimeString('en-GB', { hour: "numeric", minute: "numeric" });
             //event.endTime = api_event.eve
             event.name = api_event.name
-            //event.location = api_event.location.name
+            event.location = api_event.location
             //event.coverage_tv = true;
             //event.coverage_radio = true;
             //event.coverage_print = true;
@@ -460,6 +473,65 @@ exports.schedule_get_coverage_data = function () {
         console.log("About to run schedule_fsm from schedule_get_coverage_data.")
         schedule_fsm( null, states.GOT_EVENT_DATA);
     });
+
+}
+
+exports.schedule_get_comingup_data = function () {
+    const request = require('request');
+    /* request("http://localhost:4000/api/v1/events", { json: true }, (err, res, body) => {
+        if (err) { return console.log(err); }
+        var events = [];
+        var displayingEvents = [];
+        let days = ["Sunday", "Monday", "Tues", "Wed", "Thurs", "Friday", "Saturday"]
+        state.schedule.coverage.displaying.day = days[currentDate.getDay()]
+        for (api_event in body.events) {
+            var event = {};
+            api_event = body.events[api_event]
+            //if (api_event.la1tv_coverage_level != null) {
+            eventDate = new Date(api_event.startTime)
+            event.startRaw = api_event.startTime;
+            event.startTime = eventDate.toLocaleTimeString('en-GB', { hour: "numeric", minute: "numeric" });
+            //event.endTime = api_event.eve
+            event.name = api_event.name
+            //event.location = api_event.location.name
+            //event.coverage_tv = true;
+            //event.coverage_radio = true;
+            //event.coverage_print = true;
+            events.push(event)
+
+            if (currentDate.getDate() === eventDate.getDate()) {
+                displayingEvents.push(event)
+            }
+
+        }
+
+        state.schedule.coverage.displaying.items = displayingEvents;
+        state.schedule.coverage.items = events;
+
+        console.log("About to run schedule_fsm from schedule_get_coverage_data.")
+        schedule_fsm(null, states.GOT_EVENT_DATA);
+    }); */
+    events = {
+        now: {
+            name: "Sport name",
+            startTime: "11pm",
+            subtitle: "Live from earlier today.",
+            location: "Turf Track",
+            audioFile: "http://192.168.0.5:3001/continuity.wav",
+        },
+        next: {
+            name: "Next Sport Name",
+            startTime: "12pm",
+            subtitle: "",
+            location: "Somewhere else",
+            audioFile: "http://192.168.0.5:3001/continuity.wav",
+        }
+    }
+    state.schedule.comingup.displaying.items = events
+    console.log("About to run schedule_fsm from schedule_get_comingup_data.")
+    // Rip me, this not being async causes issues for infinite loops. Locking required.
+    setTimeout(function () {schedule_fsm(null, states.GOT_EVENT_DATA)}, 1000);
+
 
 }
 
@@ -489,7 +561,7 @@ var schedule_fsm = function (new_graphic, new_state) {
             //TODO: make this smart
             switch(new_state) {
                 case states.GET_NEXT_GRAPHIC:
-                    new_graphic = graphic_types.COVERAGE_SCHEDULE
+                    new_graphic = graphic_types.COMING_UP
                     new_state = states.NO_EVENT_DATA
                     break
                 default:
@@ -562,6 +634,34 @@ var schedule_fsm = function (new_graphic, new_state) {
                     new_graphic = graphic_types.EVENT_SCHEDULE
                     new_state = states.NO_EVENT_DATA
                     state.schedule.coverage.show = false;
+                    break
+                default:
+                    //something broke, let's go to the next graphic.
+                    new_state = states.GET_NEXT_GRAPHIC
+                    break
+            }
+            break
+
+
+        case graphic_types.COMING_UP:
+            switch(new_state) {
+                case states.NO_EVENT_DATA:
+                    new_state = states.GET_EVENT_DATA
+                    break
+                case states.GET_EVENT_DATA:
+                    exports.schedule_get_comingup_data()
+                    break
+                case states.GOT_EVENT_DATA:
+                    //Start the displaying bit
+                    state.schedule.comingup.show = true;
+                    break
+                case states.GET_NEXT_CONTENT:
+                    new_state = states.GET_EVENT_DATA
+                    break
+                case states.GET_NEXT_GRAPHIC:
+                    new_graphic = graphic_types.EVENT_SCHEDULE
+                    new_state = states.NO_EVENT_DATA
+                    state.schedule.comingup.show = false;
                     break
                 default:
                     //something broke, let's go to the next graphic.

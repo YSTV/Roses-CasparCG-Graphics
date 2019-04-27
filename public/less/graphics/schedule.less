@@ -19,7 +19,7 @@
   .header {
     font-family: Motiva-Sans-Bold, sans-serif;
     font-size: 8vh;
-    height: 8vh;
+    height: 8.5vh;
     overflow: hidden;
     max-width: 90vw;
 
@@ -49,11 +49,119 @@
     box-sizing: border-box;
     height: 70vh;
     overflow: hidden;
+  }
 
+  .day {
+    background-color: rgba(255, 12, 66, 0.3);
+    color: @brand-background-colour-secondary;
+    display: inline-block;
+    font-weight: bolder;
+    font-family: Motiva-Sans-Bold, sans-serif;
+    font-size: 70px;
+    line-height: 0.3em;
+    border-bottom: 0.3em solid transparent;
+    border-right: 0.6em solid transparent;
+    border-left: 0.2em solid transparent;
+  }
+  .events {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-bottom: 100px;
 
-    .day {
-      background-color: rgba(255, 12, 66, 0.3);
+    .event {
+      margin: 40px 80px 0 0.2em;
+    }
+  }
+  #events-scroll, #coverage-scroll {
+    overflow-y: scroll;
+  }
+  #events-scroll::-webkit-scrollbar { width: 0 !important }
+  #coverage-scroll::-webkit-scrollbar { width: 0 !important }
+
+  .event {
+    flex-shrink: 0;
+    font-weight: bold;
+
+    .time {
+      font-size: 2.3em;
+      color: @brand-background-colour-primary;
+      margin-right: 0.3em;
+      margin-bottom: 10px;
+    }
+    .location {
+      font-size: 1.7em;
+      margin-bottom: 10px;
+    }
+
+    .name {
+      font-size: 2.5em;
       color: @brand-background-colour-secondary;
+      margin-bottom: 10px;
+    }
+
+    .coverage-tv, .coverage-radio, .coverage-print {
+      display: inline-block;
+      padding: 0.5em 0.8em;
+      margin-right: 0.3em;
+      border-radius: 0.2em;
+      font-size: 1.3em;
+      color: @brand-background-colour-tertiary;
+    }
+    .coverage-tv {
+      background-color: @brand-background-colour-primary;
+    }
+    .coverage-radio {
+      background-color: @brand-background-colour-secondary;
+    }
+    .coverage-print {
+      color: @brand-background-colour-primary;
+      background-color: @brand-background-colour-tertiary;
+      .fa {
+        font-weight: normal;
+      }
+    }
+  }
+
+  .comingup {
+
+    height: calc(100vh - 10vh);
+
+    .header {
+      height: 20vh;
+
+      .title {
+        font-size: 15vh;
+      }
+    }
+
+    .comingup-logo {
+      position: absolute;
+      top: 45vh;
+      right: 0;
+      max-width: 40vw;
+    }
+
+    .content {
+      position: absolute;
+      top: 30vh;
+      max-width: 45vw;
+    }
+
+    .event {
+      .name {
+        color: @brand-background-colour-tertiary;
+      }
+      .location {
+        color: @brand-background-colour-tertiary;
+      }
+      margin-bottom: 8vh;
+    }
+
+    .now-next-header {
+      background-color: rgba(255, 12, 66, 0.3);
+      color: @brand-background-colour-tertiary;
       display: inline-block;
       font-weight: bolder;
       font-family: Motiva-Sans-Bold, sans-serif;
@@ -62,71 +170,18 @@
       border-bottom: 0.3em solid transparent;
       border-right: 0.6em solid transparent;
       border-left: 0.2em solid transparent;
-    }
-    .events {
-      height: 100%;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      padding-bottom: 100px;
+      margin: 0 0 3vh 0;
 
-      .event {
-        margin: 40px 80px 0 0.2em;
-      }
     }
-    #events-scroll, #coverage-scroll {
-      overflow-y: scroll;
-    }
-    #events-scroll::-webkit-scrollbar { width: 0 !important }
-    #coverage-scroll::-webkit-scrollbar { width: 0 !important }
-    .coverage {
-      .event {
-        margin: 40px 100px 40px 0.2em;
-      }
-    }
-    .event {
-      flex-shrink: 0;
-      font-weight: bold;
 
-      .time {
-        font-size: 2.3em;
-        color: @brand-background-colour-primary;
-        margin-right: 0.3em;
-        margin-bottom: 10px;
-      }
-      .location {
-        font-size: 1.7em;
-        margin-bottom: 10px;
-      }
-
-      .name {
-        font-size: 2.5em;
-        color: @brand-background-colour-secondary;
-        margin-bottom: 10px;
-      }
-
-      .coverage-tv, .coverage-radio, .coverage-print {
-        display: inline-block;
-        padding: 0.5em 0.8em;
-        margin-right: 0.3em;
-        border-radius: 0.2em;
-        font-size: 1.3em;
-        color: @brand-background-colour-tertiary;
-      }
-      .coverage-tv {
-        background-color: @brand-background-colour-primary;
-      }
-      .coverage-radio {
-        background-color: @brand-background-colour-secondary;
-      }
-      .coverage-print {
-        color: @brand-background-colour-primary;
-        background-color: @brand-background-colour-tertiary;
-        .fa {
-          font-weight: normal;
-        }
-      }
+    .footer {
+      position: absolute;
+      bottom: 0;
     }
+  }
+
+  .hidden {
+    display: none;
   }
 
   .footer {
@@ -139,6 +194,7 @@
       line-height: 40px;
       img {
         max-height: 1em;
+        vertical-align: bottom;
       }
     }
   }
