@@ -559,8 +559,8 @@ app.controller('clockCtrl', ['$scope', '$http',
             $scope.stopwatch.deci = time.split('.')[1];
             try {
                 $scope.$digest()
-            } catch {
-                //ignore
+            } catch(error) {
+                // Ignore, Angular isn't quite keeping up.
             }
 
         };
