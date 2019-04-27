@@ -427,7 +427,7 @@ exports.schedule_get_event_data = function () {
 
 exports.schedule_get_coverage_data = function () {
     const request = require('request');
-    request("http://localhost:4200/api/v1/events", { json: true }, (err, res, body) => {
+    request("http://localhost:4000/api/v1/events", { json: true }, (err, res, body) => {
         if (err) { return console.log(err); }
         var events = [];
         var displayingEvents = [];
@@ -510,7 +510,6 @@ var schedule_fsm = function (new_graphic, new_state) {
                 case states.GOT_EVENT_DATA:
                     //help
                     state.schedule.events.show = true;
-                    state.schedule.coverage.show = false;
                     break
                 case states.GET_NEXT_CONTENT:
                     currentDate.setDate(currentDate.getDate() + 1)
@@ -531,6 +530,7 @@ var schedule_fsm = function (new_graphic, new_state) {
                 default:
                     //something broke, let's go to the next graphic.
                     new_state = states.GET_NEXT_GRAPHIC
+                    state.schedule.events.show = false;
                     break
             }
             break
@@ -546,7 +546,6 @@ var schedule_fsm = function (new_graphic, new_state) {
                     break
                 case states.GOT_EVENT_DATA:
                     //Start the displaying bit
-                    state.schedule.events.show = false;
                     state.schedule.coverage.show = true;
                     break
                 case states.GET_NEXT_CONTENT:
@@ -563,6 +562,7 @@ var schedule_fsm = function (new_graphic, new_state) {
                 case states.GET_NEXT_GRAPHIC:
                     new_graphic = graphic_types.EVENT_SCHEDULE
                     new_state = states.NO_EVENT_DATA
+                    state.schedule.coverage.show = false;
                     break
                 default:
                     //something broke, let's go to the next graphic.
