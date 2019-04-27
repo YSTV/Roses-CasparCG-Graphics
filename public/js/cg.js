@@ -442,7 +442,7 @@ app.controller('scheduleCtrl', ['$scope', '$http',
                 }
                 let scrollby = angular.element(scroll_target).prop("scrollHeight") - angular.element(scroll_target).height();
                 angular.element(scroll_target)
-                    .animate({ scrollTop: scrollby }, { duration: scrollby*60, easing: "linear", complete: function () { setTimeout(animationComplete, 2000) } } )
+                    .animate({ scrollTop: scrollby }, { duration: scrollby*30, easing: "linear", complete: function () { setTimeout(animationComplete, 2000) } } )
                     ;
             }
             scrolling = true;
