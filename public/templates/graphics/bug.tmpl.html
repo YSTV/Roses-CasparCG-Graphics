@@ -1,6 +1,6 @@
 <div ng-controller="bugCtrl">
     <div class="logo right top toggle" ng-show="bug.showLogo">
-        <img src="{{bug.logo}}" />
+        <img ng-src="{{bug.logo}}" />
     </div>
     <div class="toggle" ng-show="bug.showGeneral">
         <div class="bug top slide-left" ng-if="bug.broadcasterLogo">
