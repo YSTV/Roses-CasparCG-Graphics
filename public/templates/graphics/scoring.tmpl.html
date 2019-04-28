@@ -1,14 +1,23 @@
 <div ng-controller="scoringCtrl">
-    <img ng-src="images/LancasterSport250.png" ng-show="roses.showScore" class="bottom leftLogo scale-fade"/>
-    <img ng-src="images/YorkSport250.png" ng-show="roses.showScore" class="bottom rightLogo scale-fade"/>
+    <img ng-src="images/LancasterSport250.png" ng-show="roses.showScore" class="bottom {{roses.yorkIsHome ? 'rightLogo' : 'leftLogo'}} scale-fade"/>
+    <img ng-src="images/YorkSport250.png" ng-show="roses.showScore" class="bottom {{roses.yorkIsHome ? 'leftLogo' : 'rightLogo'}} scale-fade"/>
     <div ng-show="roses.showScore" class="center bottom total-score scale-fade">
         <h1>{{roses.eventName}}</h1>
-        <div class="float-left lanc">
-            <p>{{roses.lancScore}}</p>
-        </div>
-        <div class="float-right york">
+
+        <div ng-if="roses.yorkIsHome" class="float-left york">
             <p>{{roses.yorkScore}}</p>
         </div>
+        <div ng-if="roses.yorkIsHome" class="float-right lanc">
+            <p>{{roses.lancScore}}</p>
+        </div>
+
+        <div ng-if="!roses.yorkIsHome"class="float-left lanc">
+            <p>{{roses.lancScore}}</p>
+        </div>
+        <div ng-if="!roses.yorkIsHome" class="float-right york">
+            <p>{{roses.yorkScore}}</p>
+        </div>
+
         <img class="event-logo" ng-src="{{roses.eventLogo}}">
     <div class="clearfix"></div>
     </div>

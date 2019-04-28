@@ -1,12 +1,15 @@
 var Stopwatch = require('./models/stopwatch');
 
 // Team names and logos.
-const homeTeamName = "Lancaster";
-const awayTeamName = "York";
-const homeTeamShortName = "LAN";
-const awayTeamShortName = "YOR";
-const homeTeamImage = "images/LancasterSport250.png";
-const awayTeamImage = "images/YorkSport250.png";
+const homeTeamName = "York";
+const awayTeamName = "Lancaster";
+const homeTeamShortName = "YOR";
+const awayTeamShortName = "LAN";
+const homeTeamImage = "images/YorkSport250.png";
+const awayTeamImage = "images/LancasterSport250.png";
+
+/* Roses Live score specific, display York as home or not. */
+const yorkIsHome = true;
 
 // The logo for the event.
 const eventLogo = "/images/roses2019logo.png";
@@ -52,6 +55,7 @@ var state_default = {
         totalPoints: 354,
         eventName: eventName,
         eventLogo: eventLogo,
+        yorkIsHome: yorkIsHome
     },
     lowerThirds: {
         left: {
