@@ -34,14 +34,14 @@
             <div id="screenBox">
                 <div id="txAreaBox"></div>
             </div>
-                
-            <div ng-controller="topRightCtrl">         
+
+            <div ng-controller="topRightCtrl">
                 <div id="topRightBox">
 
-                    <div class="time">                     
+                    <div class="time">
                         <h1>{{clock | date: "h:mma"}}</h1>
                     </div>
-                    <div class="date">                     
+                    <div class="date">
                         <h1>{{clock | date: "EEEE dd MMMM "}}</h1>
                     </div>
                     <div class="subTitle">
@@ -54,7 +54,7 @@
                         <div class="teamYorkInverse" style="width:{{yorkWidth}}">{{yorkScore}}</div>
                 </div>
             </div>
-        
+
             <div ng-controller="bottomRightCtrl">
                 <div id="bottomRightBox">
                     <div class="rowContainer">
@@ -71,43 +71,43 @@
                     </div>
                 </div>
             </div>
-            
-            <div ng-controller="bottomLeftCtrl">         
-                
-                <div ng-show="bottomLeft.momentOverride"> 
-                    <div id="bottomLeftBox">   
-                        <div class="header">                 
+
+            <div ng-controller="bottomLeftCtrl">
+
+                <div ng-show="bottomLeft.momentOverride">
+                    <div id="bottomLeftBox">
+                        <div class="header">
                             <h1>{{bottomLeft.overrideHeader}}</h1>
                         </div>
                     </div>
                     <div id="bottomCenterBox">
-                        <div class="description">                     
+                        <div class="description">
                             <h1 ng-bind-html="bottomLeft.overrideText"></h1>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <div ng-controller="bottomLeftCtrl">                  
-                <div class="animate-repeat" ng-hide="bottomLeft.momentOverride" ng-repeat="moment in moments.rows | filter: { id: currentMomentId }"> 
-                    <div id="bottomLeftBox">   
-                        <div class="header">                 
+
+            <div ng-controller="bottomLeftCtrl">
+                <div class="animate-repeat" ng-hide="bottomLeft.momentOverride" ng-repeat="moment in moments.rows | filter: { id: currentMomentId }">
+                    <div id="bottomLeftBox">
+                        <div class="header">
                             <h1>{{moment.header}}</h1>
                         </div>
                     </div>
                     <div id="bottomCenterBox">
-                        <div class="description">                     
+                        <div class="description">
                             <h1 ng-bind-html="moment.content"></h1>
                         </div>
                     </div>
                 </div>
             </div>
-        
-            <div ng-controller="tickerCtrl">   
+
+            <div ng-controller="tickerCtrl">
                 <div id="marquee"></div>
             </div>
         </div>
         <script type="text/javascript" src="/js/cg.js"></script>
-    
+
     </body>
 </html>
