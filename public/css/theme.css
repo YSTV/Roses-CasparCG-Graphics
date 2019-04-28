@@ -60,7 +60,7 @@ h1, h2, h3, h4 {
 
 #txAreaBox, #topRightBox, #bottomRightBox, #bottomLeftBox, #bottomCenterBox, #emptySpace {
     position: absolute;
-    overflow: hidden;   
+    overflow: hidden;
 }
 
 #txAreaBox {
@@ -74,16 +74,28 @@ h1, h2, h3, h4 {
     top: 0px;
     right: 0px;
     width: 240px;
-    height: 120px;
+    height: 150px;
     background-color: #1f1a34;
     border-bottom: 2px solid white;
+    overflow: visible;
 }
+
+.broadcaster-logo {
+    max-width: 100%;
+    padding: 10px 0;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+
+}
+
 #bottomRightBox {
     bottom: 60px;
     right: 0px;
     width: 240px;
-    height: 540px;
-    background: linear-gradient(135deg, #eee, #a9a9a9);
+    height: 535px;
+    background: url("/images/bottom-right-bg.png");
+    background-size: cover;
     padding-top: 12px;
     border-top: 2px solid white;
 }
@@ -137,7 +149,7 @@ strong {
 }
 
 .disableButton {
-    opacity: 0.65; 
+    opacity: 0.65;
     cursor: not-allowed;
 }
 /**************************************************/
@@ -172,14 +184,12 @@ strong {
 /**************************************************/
 
 #bottomRightBox h1 {
-    color: #1f1a34;
+    color: #fff;
     text-align: left;
     font-size: 24px;
     width: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding: 20px 12px;
     line-height: 26px;
-    padding-bottom: 12px;
 }
 
 #bottomRightBox .rowContainer{
@@ -316,7 +326,7 @@ strong {
     padding-right: 12px;
     color: #1f1a34;
     font-size: 24px;
-    margin-left: 12px;   
+    margin-left: 12px;
     margin-right: 12px;
 }
 
@@ -335,6 +345,9 @@ strong {
     padding-right: 12px;
     color: white;
 }
+
+
+
 
 /**************************************************/
 /*                   [Empty Space]                */
