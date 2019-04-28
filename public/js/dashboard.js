@@ -751,15 +751,6 @@ app.controller('rosesCGController', ['$scope', '$http',
         $scope.roses = {}
 
         /**
-         * Send changes to API.
-         */
-        $scope.$watch('roses', function() {
-            if($scope.roses) {
-                $http.post(api_root + '/roses', $scope.roses);
-            }
-        })
-
-        /**
          * Gets the Roses score.
          */
         function getRoses() {
