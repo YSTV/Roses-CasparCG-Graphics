@@ -205,7 +205,13 @@ app.controller('bottomRightCtrl', ['$scope', '$interval', '$http', 'socket',
                             buildArray["group"] = response.data[i].team.title;
                             buildArray["location"] = response.data[i].location.name;
                             buildArray["broadcast"] = response.data[i].la1tv_coverage_level;
-                            buildArray["points"] = response.data[i].point.amount;
+                            if (response.data[i].point != undefined) {
+                                //somehow this is undefined on a couple.
+                                buildArray["points"] = response.data[i].point.amount;
+                            } else {
+                                buildArray["points"] = null;
+                            }
+
                             buildArray["bgcolor"] = "fixturesDraw";
                             buildArray["resultColor"] = "";
 
@@ -393,7 +399,7 @@ app.controller('bottomLeftCtrl', ['$scope', '$interval', '$http', 'socket', '$sc
             };
 
           $http.get('https://roseslive.co.uk/feed.json', config).then(function(response) {
-              if(isNaN(response.data[0].id) || isNaN(response.data[0].id)){
+              if((response.data[0] == undefined) || isNaN(response.data[0].id)){
                 console.log("Roses live is giving us nonsense");
                 return;
               } else { 
